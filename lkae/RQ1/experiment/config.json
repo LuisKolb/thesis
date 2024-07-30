@@ -1,0 +1,12 @@
+{
+    "configs": [
+        {
+            "retriever_method": "tfidf",
+            "retriever_k": 5
+        },
+        {
+            "retriever_method": "openai",
+            "retriever_k": 5
+        }
+    ]
+}

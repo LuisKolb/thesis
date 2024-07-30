@@ -31,3 +31,38 @@ def retrieve_evidence(dataset: AuredDataset, retriever: EvidenceRetriever, kwarg
         logger.debug(f"retrieved data: {retrieved_data}")
 
     return data
+
+def get_retriever(method: str, k: int=5) -> EvidenceRetriever:
+    """Get the retriever object based on the method name. 
+    
+    Args:
+        method (str): The name of the retriever method.
+        k (int, optional): The number of retrieved documents. Defaults to 5.
+    
+    Returns:
+        EvidenceRetriever: The retriever object.
+    """
+    if 'LUCENE' in  method.upper():
+        from lkae.retrieval.methods.pyserini import LuceneRetriever
+        retriever = LuceneRetriever(k)
+
+    elif 'OPENAI' in method.upper():
+        from lkae.retrieval.methods.open_ai import OpenAIRetriever
+        retriever = OpenAIRetriever(k)
+
+    elif 'SBERT' in method.upper():
+        from lkae.retrieval.methods.sentence_transformers import SBERTRetriever
+        retriever = SBERTRetriever(k)
+
+    elif 'TFIDF' in method.upper():
+        from lkae.retrieval.methods.tfidf import TFIDFRetriever
+        retriever = TFIDFRetriever(k)
+
+    elif 'TERRIER' in method.upper():
+        from lkae.retrieval.methods.terrier import TerrierRetriever
+        retriever = TerrierRetriever(k)
+
+    else:
+        raise ValueError(f"Invalid retriever method: {method}")
+
+    return retriever
