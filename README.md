@@ -25,6 +25,11 @@ and then install the rest of the packages:
 pip install -e .
 ```
 
+running the ollama embeddings proxy server (in a separate terminal):
+```
+python -m lkae.ollama_proxy
+```
+
 ## adding the clef GitLab repo to conveniently load data
 
 at the repo root (here) execute 

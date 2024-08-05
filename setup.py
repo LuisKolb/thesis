@@ -19,6 +19,7 @@ setup(
         "plotly",
         "matplotlib",
         "transformers",
+        "sentence-transformers"
     ],
     packages=find_packages(".", ["lkae/*"]),
 )

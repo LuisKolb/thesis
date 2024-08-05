@@ -1,20 +1,10 @@
 from typing import Dict, List
 from abc import ABC, abstractmethod
+from lkae.retrieval.classes import EvidenceRetriever
 from lkae.utils.data_loading import AuredDataset
 
 import logging
 logger = logging.getLogger(__name__)
-
-# Base class for retrieval
-class EvidenceRetriever(ABC):
-    def __init__(self, k):
-        self.k = k
-        
-    @abstractmethod
-    def retrieve(self, rumor_id: str, claim: str, timeline: List, **kwargs) -> List:
-        """Retrieve documents based on the input parameters."""
-        pass
-
 
 # Specific retriever subclasses
 def retrieve_evidence(dataset: AuredDataset, retriever: EvidenceRetriever, kwargs: Dict = {}):
@@ -32,7 +22,7 @@ def retrieve_evidence(dataset: AuredDataset, retriever: EvidenceRetriever, kwarg
 
     return data
 
-def get_retriever(method: str, k: int=5) -> EvidenceRetriever:
+def get_retriever(retriever_method: str, retriever_k: int=5, **kwargs) -> EvidenceRetriever:
     """Get the retriever object based on the method name. 
     
     Args:
@@ -42,27 +32,39 @@ def get_retriever(method: str, k: int=5) -> EvidenceRetriever:
     Returns:
         EvidenceRetriever: The retriever object.
     """
-    if 'LUCENE' in  method.upper():
+    if 'LUCENE' in  retriever_method.upper():
         from lkae.retrieval.methods.pyserini import LuceneRetriever
-        retriever = LuceneRetriever(k)
+        retriever = LuceneRetriever(retriever_k, **kwargs)
 
-    elif 'OPENAI' in method.upper():
+    elif 'OPENAI' in retriever_method.upper():
         from lkae.retrieval.methods.open_ai import OpenAIRetriever
-        retriever = OpenAIRetriever(k)
+        retriever = OpenAIRetriever(retriever_k, **kwargs)
+    
+    elif 'OLLAMA' in retriever_method.upper():
+        from lkae.retrieval.methods.ollama_emb import OllamaEmbeddingRetriever
+        retriever = OllamaEmbeddingRetriever(retriever_k, **kwargs)
 
-    elif 'SBERT' in method.upper():
-        from lkae.retrieval.methods.sentence_transformers import SBERTRetriever
-        retriever = SBERTRetriever(k)
+    elif 'SBERT' in retriever_method.upper():
+        from lkae.retrieval.methods.sent_transformers import SBERTRetriever
+        retriever = SBERTRetriever(retriever_k, **kwargs)
+    
+    elif 'CROSSENCODER' in retriever_method.upper():
+        from lkae.retrieval.methods.sent_transformers import CrossEncoderRetriever
+        retriever = CrossEncoderRetriever(retriever_k, **kwargs)
 
-    elif 'TFIDF' in method.upper():
+    elif 'TFIDF' in retriever_method.upper():
         from lkae.retrieval.methods.tfidf import TFIDFRetriever
-        retriever = TFIDFRetriever(k)
+        retriever = TFIDFRetriever(retriever_k, **kwargs)
 
-    elif 'TERRIER' in method.upper():
+    elif 'BM25' in retriever_method.upper():
+        from lkae.retrieval.methods.bm25 import BM25Retriever
+        retriever = BM25Retriever(retriever_k, **kwargs)
+
+    elif 'TERRIER' in retriever_method.upper():
         from lkae.retrieval.methods.terrier import TerrierRetriever
-        retriever = TerrierRetriever(k)
+        retriever = TerrierRetriever(retriever_k, **kwargs)
 
     else:
-        raise ValueError(f"Invalid retriever method: {method}")
+        raise ValueError(f"Invalid retriever method: {retriever_method}")
 
     return retriever

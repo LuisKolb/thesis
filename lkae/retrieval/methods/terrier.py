@@ -7,10 +7,6 @@ from lkae.utils.data_loading import AuredDataset, AuthorityPost
 from pyterrier.batchretrieve import BatchRetrieve
 from pyterrier.index import IndexingType, DFIndexer
 
-from pyterrier.io import write_results, read_results, read_qrels
-from pyterrier.pipelines import Evaluate
-from ir_measures import R,P,MAP
-
 import logging
 logger = logging.getLogger(__name__)
 
@@ -20,7 +16,7 @@ class TerrierRetriever(EvidenceRetriever):
         # init pyterrier
         import pyterrier as pt
         if not pt.started():
-            pt.init(boot_packages=["com.github.terrierteam:terrier-prf:-SNAPSHOT"])
+            pt.init()#boot_packages=["com.github.terrierteam:terrier-prf:-SNAPSHOT"])
 
     def retrieve(self, rumor_id: str, claim: str, timeline: List[AuthorityPost], **kwargs) -> List:
         logger.info(f"retrieving documents for rumor_id: {rumor_id}")
@@ -61,38 +57,3 @@ class TerrierRetriever(EvidenceRetriever):
             ranked_results.append([row.qid, row.docno, int(row.rank)+1, row.score]) 
 
         return ranked_results
-
-
-    def retrieve_ds(self, dataset: AuredDataset, filename: str):
-        # clear output file since we only append later
-        if not filename.endswith(".trec.txt"):
-            raise ValueError("filename does not end with .trec.txt")
-        
-        with open(filename, "w"): pass
-
-        for i, entry in enumerate(dataset[:]):
-            data = []
-            rumor_id = entry['id']
-            claim = entry['rumor']
-            timeline = entry['timeline']
-
-            for post in timeline:
-                data.append(
-                    {
-                        "qid": rumor_id.strip(), 
-                        "query": "".join([c if c.isalnum() else " " for c in claim]).strip(), # clean claim, keep only alphanumeric chars
-                        "docno": post.post_id.strip(),
-                        "text": post.text.strip()
-                    }
-                )
-
-            df = pd.DataFrame(data, columns=["qid", "query", "docno", "text"])
-
-            indexref = DFIndexer(index_path="", type=IndexingType.MEMORY).index(df["text"], df)
-
-            bm25 = BatchRetrieve(indexref, wmodel="BM25", controls={"termpipelines": "Stopwords,PorterStemmer"}, metadata=["docno", "text"])
-            pl2 = BatchRetrieve(indexref, wmodel="PL2", controls={"termpipelines": "Stopwords,PorterStemmer"}, metadata=["docno", "text"])
-            pipeline = (bm25) >> (pl2 % 5)
-            
-            rtr = pipeline(data)
-            write_results(rtr, filename, "trec", append=True)

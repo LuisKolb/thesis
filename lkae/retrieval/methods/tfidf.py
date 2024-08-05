@@ -6,8 +6,8 @@ from lkae.retrieval.retrieve import EvidenceRetriever
 
 
 class TFIDFRetriever(EvidenceRetriever):
-    def __init__(self, k):
-        super().__init__(k)
+    def __init__(self, retriever_k, **kwargs):
+        super().__init__(retriever_k)
 
     def retrieve(self, rumor_id: str, claim: str, timeline: List, **kwargs):
         # Get only doc texts

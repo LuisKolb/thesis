@@ -1,4 +1,0 @@
-{
-    "retriever_method": "tfidf",
-    "retriever_k": 5
-}
