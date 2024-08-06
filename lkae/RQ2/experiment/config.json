@@ -1,0 +1,12 @@
+{
+    "configs": [
+        {
+            "verifier_method": "transformers-roberta",
+            "model": "roberta-large-mnli"
+        },
+        {
+            "verifier_method": "transformers-bart",
+            "model": "facebook/bart-large-mnli"
+        }
+    ]
+}

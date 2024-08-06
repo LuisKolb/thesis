@@ -173,6 +173,44 @@ def eval_run_custom(pred_file, gold_file, out_file):
     )
     return (macro_F1, strict_macro_F1)
 
+def eval_run_custom_nofile(pred_list, gold_list):
+    """
+    basically the same, but without saving to file
+    """
+    gold_dict_labels = {}
+    gold_dict_evidence = {}
+    for line in gold_list:
+        gold_dict_labels[line["id"]] = line["label"]
+        temp_ev = []
+        for ev in line["evidence"]:
+            temp_ev.append(str(ev[1]))
+        gold_dict_evidence[line["id"]] = temp_ev
+
+    pred = [line for line in pred_list]
+    pred_labels = [line["predicted_label"] for line in pred]
+    pred_evidence = []
+    for line in pred:
+        pred_instance = []
+        for ev in line["predicted_evidence"]:
+            pred_instance.append(str(ev[1]))
+        pred_evidence.append(pred_instance)
+
+    actual_labels = []
+    actual_evidence = []
+    for line in pred:
+        actual_labels.append(gold_dict_labels[line["id"]])
+        actual_instance = []
+        for i in gold_dict_evidence[line["id"]]:
+            actual_instance.append(i)
+        actual_evidence.append(actual_instance)
+
+    # compute macro-F1 and strict macro-F1
+    macro_F1 = f1_macro(actual_labels, pred_labels)
+    strict_macro_F1 = f1_macro_strict(
+        actual_labels, pred_labels, actual_evidence, pred_evidence
+    )
+    return (macro_F1, strict_macro_F1)
+
 import pyterrier as pt
 import pyterrier.io as ptio
 import pyterrier.pipelines as ptpipelines

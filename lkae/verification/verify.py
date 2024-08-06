@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # second logger for logging claim and evidence text score + judgement
-logger_text_score = logging.getLogger('clef.verification.verify_log')
+logger_text_score = logging.getLogger('lkae.verification.verify_log')
 
 class VerificationResult(NamedTuple):
     label: str
@@ -111,6 +111,27 @@ class Judge(object):
         return pred_label, predicted_evidence
 
 
+def get_verifier(verifier_method: str, **kwargs) -> BaseVerifier:
+    if 'LLAMA3' in verifier_method.upper():
+        from lkae.verification.models.hf_llama3 import Llama3Verifier
+        return Llama3Verifier(**kwargs)
+
+    elif 'OPENAI' in verifier_method.upper():
+        from lkae.verification.models.open_ai import OpenaiVerifier
+        return OpenaiVerifier(**kwargs)
+    
+    elif 'OLLAMA' in verifier_method.upper():
+        from lkae.verification.models.ollama import OllamaVerifier
+        return OllamaVerifier(**kwargs)
+    
+    elif 'TRANSFORMERS' in verifier_method.upper():
+        from lkae.verification.models.transformers_verifier import TransformersVerifier
+        return TransformersVerifier(**kwargs)
+
+    else:
+        raise ValueError(f"Invalid verifier method: {verifier_method}")
+    
+
 def judge_using_evidence(rumor_id, claim: str, evidence: List[AuthorityPost], verifier: BaseVerifier, judge: Judge):
     evidences_with_decisions = []
 
@@ -139,8 +160,15 @@ def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge
 
         if not item["retrieved_evidence"]:
             # only run fact check if we actually have retrieved evidence
-            logger.warn(f'key "retrieved_evidence" was empty for rumor with id {claim}')
-            return []
+            logger.warn(f'key "retrieved_evidence" was empty for rumor with id {rumor_id}')
+            res_jsons.append(
+                {
+                    "id": rumor_id,
+                    "predicted_label": "NOT ENOUGH INFO",
+                    "predicted_evidence": [],
+                }
+            )
+            continue
         
         retrieved_evidence = item["retrieved_evidence"] 
         
