@@ -239,6 +239,75 @@ class AuredDataset(object):
         
         logger.info(f'added {num_rows} scores from {trec_judgements_path} to the evidence entries')
 
+
+    def add_trec_list_judgements(self, trec_judgements_list, normalize_scores=True):
+        """
+        create a list of RankedDocs objects in key retrieved_evidence from TREC-formatted list
+
+        Parameters:
+            - trec_judgements_list: TREC-formatted list containing rank and score
+            - sep: separator used in TREC file
+
+        Returns:
+        none, modifies the dataset in place
+        """
+        trec_by_id = {}
+        max_score = 0
+        min_score = 0
+        num_rows = 0
+
+        for trec_judgements in trec_judgements_list:
+
+            rumor_id, evidence_id, rank, score = trec_judgements
+            rank += 1 # convert to 1-based ranking, is usually 0-based
+            score = float(score)
+            if rumor_id not in trec_by_id:
+                trec_by_id[rumor_id] = {}
+            
+            # keep max,min score values to normalize later
+            # scores should always be positive, but still do this...
+            if score < min_score:
+                min_score = score
+            if score > max_score:
+                max_score = score
+
+            # add entry to dict for lookup later 
+            trec_by_id[rumor_id][evidence_id] = (rank, score)
+            num_rows += 1
+        
+        if (max_score-min_score) == 0:
+            logger.error(f'encountered (max_score-min_score) == 0; max={max_score}; min={min_score}')
+            raise ValueError()
+
+        for i, item in enumerate(self.rumors):
+            timeline: List[AuthorityPost] = item['timeline']
+            
+            item['retrieved_evidence'] = []
+
+            doc_ranks = trec_by_id[item['id']]
+
+            for post in timeline:
+                if post.post_id in doc_ranks:
+                    rank, score = doc_ranks[post.post_id]
+                    
+                    # normalize score to [0...1] using max,min scores from earlier
+                    if not normalize_scores: 
+                        score_norm = score
+                    else: 
+                        score_norm = (score-min_score) / (max_score-min_score)
+                    
+                    item['retrieved_evidence'].append(AuthorityPost(
+                        post.url, 
+                        post.post_id, 
+                        post.text,
+                        int(rank),
+                        float(score_norm),
+                    )) 
+            
+            self.rumors[i] = item
+        
+        logger.info(f'added {num_rows} scores from trec_judgements_list to the evidence entries')
+
 def load_pkl(file_path) -> AuredDataset:
     if not os.path.exists(file_path):
         raise FileNotFoundError(f'file {file_path} does not exist')

@@ -1,8 +1,0 @@
-{
-    "blind_run": false,
-    "retriever_k": 5,
-    "preprocess": true,
-    "add_author_name": false,
-    "add_author_bio": false,
-    "author_info_filepath": ""
-}

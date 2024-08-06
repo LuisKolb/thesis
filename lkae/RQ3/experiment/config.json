@@ -1,0 +1,28 @@
+{
+    "configs": [
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "transformers-roberta",
+            "model": "roberta-large-mnli"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "transformers-bart",
+            "model": "facebook/bart-large-mnli"
+        },
+        {
+            "retriever_method": "tfidf",
+            "retriever_k": 5,
+            "verifier_method": "transformers-roberta",
+            "model": "roberta-large-mnli"
+        },
+        {
+            "retriever_method": "tfidf",
+            "retriever_k": 5,
+            "verifier_method": "transformers-bart",
+            "model": "facebook/bart-large-mnli"
+        }
+    ]
+}

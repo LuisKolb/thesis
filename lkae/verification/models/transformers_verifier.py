@@ -6,7 +6,7 @@ import torch
 from lkae.verification.verify import BaseVerifier, VerificationResult
 
 class TransformersVerifier(BaseVerifier):
-    def __init__(self, model: str = "roberta-large-mnli") -> None:
+    def __init__(self, model: str = "roberta-large-mnli", **kwargs) -> None:
 
         # Initialize the NLI pipeline with a pre-trained model
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
