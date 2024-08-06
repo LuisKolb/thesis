@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 class OllamaVerifier(BaseVerifier):
     client: OpenAI
-    model: str = "gpt-4-turbo-preview"
     valid_labels: List =  [
             "REFUTES",
             "NOT ENOUGH INFO",
@@ -32,7 +31,7 @@ You must format your answer in JSON format, like this: {"decision": ["SUPPORTS"|
 No yapping.
 """ 
 
-    def __init__(self, api_key:str='') -> None:
+    def __init__(self, api_key:str='', **kwargs) -> None:
         self.client = OpenAI(
             base_url = 'http://localhost:11434/v1',
             api_key="ollama" # required, but unused
@@ -40,6 +39,7 @@ No yapping.
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0
+        # todo: add verifier_model param
     
     def get_completion(self, input_message) -> ChatCompletion:
         completion = self.client.chat.completions.create(

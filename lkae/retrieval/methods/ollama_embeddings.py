@@ -9,12 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class OllamaEmbeddingRetriever(EvidenceRetriever):
-    def __init__(self, retriever_k, model="mxbai-embed-large", **kwargs):
+    def __init__(self, retriever_k, retriever_model="mxbai-embed-large", **kwargs):
         self.client = OpenAI(
             base_url="http://localhost:11435/v1",
             api_key="ollama",  # required, but unused
         )
-        self.model = model
+        self.model = retriever_model
         logger.info(f"OpenAI client initialized with ollama")
         super().__init__(retriever_k)
 

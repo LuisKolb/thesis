@@ -10,10 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIRetriever(EvidenceRetriever):
-    def __init__(self, k, api_key=None):
+    def __init__(self, retriever_k, api_key=None):
         self.client = OpenAI(api_key=api_key or os.environ.get("OPENAI_API_KEY"))
         logger.info(f'OpenAI client initialized with {"API key from .env" if api_key else "provided API key"}')
-        super().__init__(k)
+        super().__init__(retriever_k)
+        # todo: add retriever_model param
 
     def get_embedding(self, text):
         response = self.client.embeddings.create(

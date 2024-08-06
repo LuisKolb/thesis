@@ -15,8 +15,8 @@ class SBERTRetriever(EvidenceRetriever):
     see also: https://huggingface.co/docs/inference-endpoints/index
     """
 
-    def __init__(self, k, embedding_model="all-MiniLM-L6-v2"):
-        self.embedder = SentenceTransformer(embedding_model)
+    def __init__(self, k, retriever_model="all-MiniLM-L6-v2"):
+        self.embedder = SentenceTransformer(retriever_model)
         super().__init__(k)
 
     def retrieve(
@@ -61,9 +61,9 @@ class SBERTRetriever(EvidenceRetriever):
 
 
 class CrossEncoderRetriever(EvidenceRetriever):
-    def __init__(self, retriever_k, model="cross-encoder/stsb-roberta-large", **kwargs):
-        print(f"Initializing CrossEncoderRetriever with model: {model}")
-        self.model = CrossEncoder(model)
+    def __init__(self, retriever_k, retriever_model="cross-encoder/stsb-roberta-large", **kwargs):
+        print(f"Initializing CrossEncoderRetriever with model: {retriever_model}")
+        self.model = CrossEncoder(retriever_model)
         super().__init__(retriever_k)
 
     def retrieve(

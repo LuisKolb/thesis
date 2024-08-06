@@ -1,3 +1,4 @@
+import time
 from typing import List
 import requests
 import os
@@ -18,17 +19,23 @@ class HFSentenceTransformersRetriever(EvidenceRetriever):
     def __init__(
         self,
         retriever_k,
-        model="sentence-transformers/multi-qa-distilbert-cos-v1",
+        retriever_model="sentence-transformers/multi-qa-distilbert-cos-v1",
         api_key="",
         **kwargs,
     ):
-        print(f"Initializing HFSentenceTransformersRetriever with model: {model}")
+        print(f"Initializing HFSentenceTransformersRetriever with model: {retriever_model}")
 
         self.api_key = api_key or os.environ.get("HF_API_KEY")
         self.headers = {"Authorization": f"Bearer {self.api_key}"}
-        self.API_URL = f"https://api-inference.huggingface.co/models/{model}"
+        self.API_URL = f"https://api-inference.huggingface.co/models/{retriever_model}"
+
+        self.query(
+            {"inputs": {"source_sentence": "warm me up scotty", "sentences": ["bzzt"]}}
+        )
+        
 
         super().__init__(retriever_k)
+
 
     def retrieve(
         self, rumor_id: str, claim: str, timeline: List[AuthorityPost], **kwargs
@@ -57,8 +64,18 @@ class HFSentenceTransformersRetriever(EvidenceRetriever):
 
         return ranked
 
+
     def query(self, payload):
         response = requests.post(self.API_URL, headers=self.headers, json=payload)
+        if response.status_code != 200:
+            if response.status_code == 503:
+                # need to warm up the model, see https://huggingface.co/docs/api-inference/quicktour#model-loading-and-latency
+                res = response.json()
+                print(f"Waiting for model to warm up (for {res['estimated_time']} seconds)")
+                time.sleep(int(res["estimated_time"]))
+                response = requests.post(self.API_URL, headers=self.headers, json=payload)
+            else:
+                raise ValueError(f"Error: {response.status_code}; Text: {response.text}")
         return response.json()
 
 

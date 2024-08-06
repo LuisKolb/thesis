@@ -6,11 +6,11 @@ import torch
 from lkae.verification.verify import BaseVerifier, VerificationResult
 
 class TransformersVerifier(BaseVerifier):
-    def __init__(self, model: str = "roberta-large-mnli", **kwargs) -> None:
+    def __init__(self, verifier_model: str = "roberta-large-mnli", **kwargs) -> None:
 
         # Initialize the NLI pipeline with a pre-trained model
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.pipe: Pipeline = pipeline("text-classification", model=model, device=device)
+        self.pipe: Pipeline = pipeline("text-classification", model=verifier_model, device=device)
 
         self.label_map = {
             "CONTRADICTION": "REFUTES",

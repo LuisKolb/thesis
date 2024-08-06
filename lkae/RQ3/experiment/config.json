@@ -4,25 +4,25 @@
             "retriever_method": "bm25",
             "retriever_k": 5,
             "verifier_method": "transformers-roberta",
-            "model": "roberta-large-mnli"
+            "verifier_model": "roberta-large-mnli"
         },
         {
             "retriever_method": "bm25",
             "retriever_k": 5,
-            "verifier_method": "transformers-bart",
-            "model": "facebook/bart-large-mnli"
+            "verifier_method": "openai"
         },
         {
-            "retriever_method": "tfidf",
+            "retriever_method": "sent-transformers-hf",
             "retriever_k": 5,
+            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1",
             "verifier_method": "transformers-roberta",
-            "model": "roberta-large-mnli"
+            "verifier_model": "roberta-large-mnli"
         },
         {
-            "retriever_method": "tfidf",
+            "retriever_method": "sent-transformers-hf",
             "retriever_k": 5,
-            "verifier_method": "transformers-bart",
-            "model": "facebook/bart-large-mnli"
+            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1",
+            "verifier_method": "openai"
         }
     ]
 }

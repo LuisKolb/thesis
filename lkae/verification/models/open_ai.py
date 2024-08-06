@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 class OpenaiVerifier(BaseVerifier):
     client: OpenAI
-    model: str = "gpt-4-turbo-preview"
     valid_labels: List =  [
             "REFUTES",
             "NOT ENOUGH INFO",
@@ -32,7 +31,7 @@ You must format your answer in JSON format, like this: {"decision": ["SUPPORTS"|
 No yapping.
 """ 
 
-    def __init__(self, api_key:str='') -> None:
+    def __init__(self, api_key:str='', **kwargs) -> None:
         self.client = OpenAI(
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
@@ -41,17 +40,17 @@ No yapping.
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0
     
-    def get_completion(self, input_message) -> ChatCompletion:
-        completion = self.client.chat.completions.create(
-            model="gpt-4-turbo-preview",
-            messages=[
-                {"role": "system", "content": self.system_message},
-                {"role": "user", "content": input_message}
-            ],
-            temperature=0.2
-        )
+    # def get_completion(self, input_message) -> ChatCompletion:
+    #     completion = self.client.chat.completions.create(
+    #         model="gpt-4-turbo-preview",
+    #         messages=[
+    #             {"role": "system", "content": self.system_message},
+    #             {"role": "user", "content": input_message}
+    #         ],
+    #         temperature=0.2
+    #     )
 
-        return completion
+    #     return completion
     
     def get_assistant_response(self, input_message):
         thread = self.client.beta.threads.create()
