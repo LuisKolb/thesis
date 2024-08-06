@@ -8,7 +8,9 @@ import lkae
 from lkae.utils.preprocessing import clean_text_custom
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 class AuthorityPost(NamedTuple):
     """
@@ -18,6 +20,7 @@ class AuthorityPost(NamedTuple):
     rank: Optional[int]
     score: Optional[float]
     """
+
     url: str
     post_id: str
     text: str
@@ -34,26 +37,35 @@ class RumorWithEvidence(TypedDict):
     evidence: Optional[List[AuthorityPost]] # not required
     retrieved_evidence: Optional[List[AuthorityPost]] # not required
     """
+
     id: str
     rumor: str
     label: Optional[str]
     timeline: List[AuthorityPost]
-    evidence: Optional[List[AuthorityPost]] # not required
-    retrieved_evidence: Optional[List[AuthorityPost]] # not required
+    evidence: Optional[List[AuthorityPost]]  # not required
+    retrieved_evidence: Optional[List[AuthorityPost]]  # not required
 
 
-    
 # paths in the modules
-root_dir            = os.path.dirname(lkae.__file__) # module root
-pkl_dir             = os.path.join(root_dir, 'index')
+root_dir = os.path.dirname(lkae.__file__)  # module root
+pkl_dir = os.path.join(root_dir, "index")
 
-eng_combined_jsonl  = os.path.join(root_dir, 'data', 'English_combined.jsonl')
-eng_dev_jsonl       = os.path.join(root_dir, 'data', 'English_dev.jsonl')
-eng_train_jsonl     = os.path.join(root_dir, 'data', 'English_train.jsonl')
+eng_combined_jsonl = os.path.join(root_dir, "data", "English_combined.jsonl")
+eng_dev_jsonl = os.path.join(root_dir, "data", "English_dev.jsonl")
+eng_train_jsonl = os.path.join(root_dir, "data", "English_train.jsonl")
 
 
 class AuredDataset(object):
-    def __init__(self, filepath, preprocess, add_author_name, add_author_bio, blind_run=True, author_info_filepath='../../lkae/combined-author-data-translated.json', **kwargs) -> None:
+    def __init__(
+        self,
+        filepath,
+        preprocess,
+        add_author_name,
+        add_author_bio,
+        blind_run=True,
+        author_info_filepath="../../lkae/combined-author-data-translated.json",
+        **kwargs,
+    ) -> None:
         self.filepath: Union[str, os.PathLike] = filepath
         self.rumors: List[RumorWithEvidence] = []
 
@@ -75,69 +87,71 @@ class AuredDataset(object):
 
         self.load_rumor_data()
 
-
     def __str__(self) -> str:
         return json.dumps(self.rumors, indent=2)
-    
-    def __iter__(self) -> Generator[RumorWithEvidence,None,None]:
+
+    def __iter__(self) -> Generator[RumorWithEvidence, None, None]:
         for rumor_item in self.rumors:
             yield rumor_item
-    
+
     def __getitem__(self, idx):
         return self.rumors[idx]
 
     def __setitem__(self, idx, val):
         self.rumors[idx] = val
-    
+
     def __len__(self) -> int:
         return len(self.rumors)
-    
+
     def load_rumor_data(self):
         jsons = self.load_rumors_from_jsonl()
 
         for item in jsons:
             entry = RumorWithEvidence(item)
-            entry['timeline'] = [AuthorityPost(*post, None, None) for post in entry['timeline']] # type: ignore
-            if 'evidence' in entry and entry['evidence']:
-                entry['evidence'] = [AuthorityPost(*post, None, None) for post in entry['evidence']] # type: ignore
-            entry['retrieved_evidence'] = []
+            entry["timeline"] = [AuthorityPost(*post, None, None) for post in entry["timeline"]]  # type: ignore
+            if "evidence" in entry and entry["evidence"]:
+                entry["evidence"] = [AuthorityPost(*post, None, None) for post in entry["evidence"]]  # type: ignore
+            entry["retrieved_evidence"] = []
             self.rumors.append(entry)
 
-        logger.info(f'loaded {len(jsons)} json entries from {self.filepath}')
+        logger.info(f"loaded {len(jsons)} json entries from {self.filepath}")
 
         for item in self.rumors:
-            item['timeline'] = self.format_posts(item['timeline'])
-            if 'evidence' in item and item['evidence']:
-                item['evidence'] = self.format_posts(item['evidence'])
+            item["timeline"] = self.format_posts(item["timeline"])
+            if "evidence" in item and item["evidence"]:
+                item["evidence"] = self.format_posts(item["evidence"])
             if self.preprocess:
-                item['rumor'] = clean_text_custom(item['rumor'])
-    
+                item["rumor"] = clean_text_custom(item["rumor"])
+
     def get_grouped_rumors(self):
         """
         returns a dict with mapping {rumor_id: RumorWithEvidence}
         """
-        grouped = {} 
+        grouped = {}
         for item in self.rumors:
-            grouped[item['id']] = item # add to grouped dict 
+            grouped[item["id"]] = item  # add to grouped dict
         return grouped
 
     def load_rumors_from_jsonl(self) -> List[RumorWithEvidence]:
         jsons = []
-        with open(self.filepath, encoding='utf-8') as file:
+        with open(self.filepath, encoding="utf-8") as file:
             for line in file:
                 jsons += [json.loads(line)]
         return jsons
-    
+
     def format_posts(self, post_list: List[AuthorityPost]):
         new_post_list = []
         author_info = {}
         if self.add_author_bio or self.add_author_name:
-            with open(self.author_info_filepath, 'r') as file:
+            with open(self.author_info_filepath, "r") as file:
                 author_info = json.load(file)
 
         for post in post_list:
-            # use regex to verify if the account url is valid  
-            if re.match(r'(https:\/\/)?twitter.com/[\w+]{1,15}\b', post.url) and not self.add_author_name:
+            # use regex to verify if the account url is valid
+            if (
+                re.match(r"(https:\/\/)?twitter.com/[\w+]{1,15}\b", post.url)
+                and not self.add_author_name
+            ):
                 new_post_text = f'Statement from Authority Account "{post.url.split("/")[-1]}": "{post.text}"'
             else:
                 # dont add author handle here if author name is added later
@@ -145,29 +159,33 @@ class AuredDataset(object):
 
             if author_info:
                 account = post.url.strip()
-                if not account.startswith('https://'):
-                    account = f'https://{account}'
+                if not account.startswith("https://"):
+                    account = f"https://{account}"
                 name = author_info[account]["translated_name"]
                 bio = author_info[account]["translated_bio"]
-                
+
                 if bio and self.add_author_bio:
                     new_post_text = f'Authority Description: "{bio}"\n' + new_post_text
                 if name and self.add_author_name:
                     new_post_text = f'Authority Name: "{name}"\n' + new_post_text
-                
+
                 # if all info is added, evidence will look like this:
-                # 
+                #
                 # Authority Description: "{bio}"
                 # Authority Name: "{name}"
                 # Statement from {twitter handle}: "{post.text}"
 
             if self.preprocess:
                 new_post_text = clean_text_custom(new_post_text)
-            
-            new_post_list.append(AuthorityPost(post.url, post.post_id, new_post_text, None, None))
+
+            new_post_list.append(
+                AuthorityPost(post.url, post.post_id, new_post_text, None, None)
+            )
         return new_post_list
-    
-    def add_trec_file_judgements(self, trec_judgements_path, sep=' ', normalize_scores=True):
+
+    def add_trec_file_judgements(
+        self, trec_judgements_path, sep=" ", normalize_scores=True
+    ):
         """
         create a list of RankedDocs objects in key retrieved_evidence from TREC-formatted file
 
@@ -183,18 +201,18 @@ class AuredDataset(object):
         min_score = 0
         num_rows = 0
 
-        with open(trec_judgements_path, 'r') as file:
+        with open(trec_judgements_path, "r") as file:
             for line in file:
                 # handle edge case where dataset may contain field which contain an additional whitespace, ...
                 # which was then saved together with the field value as a string looking like 'id 0 "id " 1'
                 # (only seems to affect TERRIER trec files)
-                line = re.sub('"', '', line)
-                line = re.sub('  ', ' ', line)
+                line = re.sub('"', "", line)
+                line = re.sub("  ", " ", line)
                 rumor_id, _, evidence_id, rank, score, tag = line.split(sep)
                 score = float(score)
                 if rumor_id not in trec_by_id:
                     trec_by_id[rumor_id] = {}
-                
+
                 # keep max,min score values to normalize later
                 # scores should always be positive, but still do this...
                 if score < min_score:
@@ -202,43 +220,48 @@ class AuredDataset(object):
                 if score > max_score:
                     max_score = score
 
-                # add entry to dict for lookup later 
+                # add entry to dict for lookup later
                 trec_by_id[rumor_id][evidence_id] = (rank, score)
                 num_rows += 1
-        
-        if (max_score-min_score) == 0:
-            logger.error(f'encountered (max_score-min_score) == 0; max={max_score}; min={min_score}')
+
+        if (max_score - min_score) == 0:
+            logger.error(
+                f"encountered (max_score-min_score) == 0; max={max_score}; min={min_score}"
+            )
             raise ValueError()
 
         for i, item in enumerate(self.rumors):
-            timeline: List[AuthorityPost] = item['timeline']
-            
-            item['retrieved_evidence'] = []
+            timeline: List[AuthorityPost] = item["timeline"]
 
-            doc_ranks = trec_by_id[item['id']]
+            item["retrieved_evidence"] = []
+
+            doc_ranks = trec_by_id[item["id"]]
 
             for post in timeline:
                 if post.post_id in doc_ranks:
                     rank, score = doc_ranks[post.post_id]
-                    
-                    # normalize score to [0...1] using max,min scores from earlier
-                    if not normalize_scores: 
-                        score_norm = score
-                    else: 
-                        score_norm = (score-min_score) / (max_score-min_score)
-                    
-                    item['retrieved_evidence'].append(AuthorityPost(
-                        post.url, 
-                        post.post_id, 
-                        post.text,
-                        int(rank),
-                        float(score_norm),
-                    )) 
-            
-            self.rumors[i] = item
-        
-        logger.info(f'added {num_rows} scores from {trec_judgements_path} to the evidence entries')
 
+                    # normalize score to [0...1] using max,min scores from earlier
+                    if not normalize_scores:
+                        score_norm = score
+                    else:
+                        score_norm = (score - min_score) / (max_score - min_score)
+
+                    item["retrieved_evidence"].append(
+                        AuthorityPost(
+                            post.url,
+                            post.post_id,
+                            post.text,
+                            int(rank),
+                            float(score_norm),
+                        )
+                    )
+
+            self.rumors[i] = item
+
+        logger.info(
+            f"added {num_rows} scores from {trec_judgements_path} to the evidence entries"
+        )
 
     def add_trec_list_judgements(self, trec_judgements_list, normalize_scores=True):
         """
@@ -259,11 +282,11 @@ class AuredDataset(object):
         for trec_judgements in trec_judgements_list:
 
             rumor_id, evidence_id, rank, score = trec_judgements
-            rank += 1 # convert to 1-based ranking, is usually 0-based
+            rank += 1  # convert to 1-based ranking, is usually 0-based
             score = float(score)
             if rumor_id not in trec_by_id:
                 trec_by_id[rumor_id] = {}
-            
+
             # keep max,min score values to normalize later
             # scores should always be positive, but still do this...
             if score < min_score:
@@ -271,45 +294,52 @@ class AuredDataset(object):
             if score > max_score:
                 max_score = score
 
-            # add entry to dict for lookup later 
+            # add entry to dict for lookup later
             trec_by_id[rumor_id][evidence_id] = (rank, score)
             num_rows += 1
-        
-        if (max_score-min_score) == 0:
-            logger.error(f'encountered (max_score-min_score) == 0; max={max_score}; min={min_score}')
+
+        if (max_score - min_score) == 0:
+            logger.error(
+                f"encountered (max_score-min_score) == 0; max={max_score}; min={min_score}"
+            )
             raise ValueError()
 
         for i, item in enumerate(self.rumors):
-            timeline: List[AuthorityPost] = item['timeline']
-            
-            item['retrieved_evidence'] = []
+            timeline: List[AuthorityPost] = item["timeline"]
 
-            doc_ranks = trec_by_id[item['id']]
+            item["retrieved_evidence"] = []
+
+            doc_ranks = trec_by_id[item["id"]]
 
             for post in timeline:
                 if post.post_id in doc_ranks:
                     rank, score = doc_ranks[post.post_id]
-                    
+
                     # normalize score to [0...1] using max,min scores from earlier
-                    if not normalize_scores: 
+                    if not normalize_scores:
                         score_norm = score
-                    else: 
-                        score_norm = (score-min_score) / (max_score-min_score)
-                    
-                    item['retrieved_evidence'].append(AuthorityPost(
-                        post.url, 
-                        post.post_id, 
-                        post.text,
-                        int(rank),
-                        float(score_norm),
-                    )) 
-            
+                    else:
+                        score_norm = (score - min_score) / (max_score - min_score)
+
+                    item["retrieved_evidence"].append(
+                        AuthorityPost(
+                            post.url,
+                            post.post_id,
+                            post.text,
+                            int(rank),
+                            float(score_norm),
+                        )
+                    )
+
             self.rumors[i] = item
-        
-        logger.info(f'added {num_rows} scores from trec_judgements_list to the evidence entries')
+
+        logger.info(
+            f"added {num_rows} scores from trec_judgements_list to the evidence entries"
+        )
+
 
 def load_pkl(file_path) -> AuredDataset:
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f'file {file_path} does not exist')
-    with open(file_path, 'rb') as file:
+        raise FileNotFoundError(f"file {file_path} does not exist")
+    with open(file_path, "rb") as file:
         return pkl.load(file)

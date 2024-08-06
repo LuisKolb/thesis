@@ -2,13 +2,11 @@ import os
 import numpy as np
 from openai import OpenAI
 
-from lkae.retrieval.classes import EvidenceRetriever
+from lkae.retrieval.types import EvidenceRetriever
+from lkae.utils.scoring import cosine_similarity
 
 import logging
 logger = logging.getLogger(__name__)
-
-def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 
 class OpenAIRetriever(EvidenceRetriever):
@@ -54,6 +52,20 @@ class OpenAIRetriever(EvidenceRetriever):
 
         ranked_results = []
         for i, (cos_sim, tweet) in enumerate(zip(scores, relevant_tweets)):
-            ranked_results.append([rumor_id, tweet[1], i + 1, cos_sim])
+            ranked_results.append([rumor_id, tweet[1], i+1, cos_sim])
 
         return ranked_results
+    
+if __name__ == "__main__":
+    import os
+    from lkae.utils.data_loading import pkl_dir, load_pkl
+
+    ds = load_pkl(os.path.join(pkl_dir, "English_train", "pre-nam-bio.pkl"))
+    sample = ds[0]
+    retriever = OpenAIRetriever(5)
+    data = retriever.retrieve(
+        rumor_id=sample["id"], claim=sample["rumor"], timeline=sample["timeline"]
+    )
+
+    for d in data:
+        print(d)

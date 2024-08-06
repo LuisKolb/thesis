@@ -1,24 +1,27 @@
 from typing import List
 import pandas as pd
 
-from lkae.retrieval.retrieve import EvidenceRetriever
-from lkae.utils.data_loading import AuredDataset, AuthorityPost
-
 from pyterrier.batchretrieve import BatchRetrieve
 from pyterrier.index import IndexingType, DFIndexer
+
+from lkae.retrieval.types import EvidenceRetrieverResult
+from lkae.retrieval.retrieve import EvidenceRetriever
+from lkae.utils.data_loading import AuredDataset, AuthorityPost
 
 import logging
 logger = logging.getLogger(__name__)
 
+
 class TerrierRetriever(EvidenceRetriever):
-    def __init__(self, k, filename=""):
-        super().__init__(k)
+    def __init__(self, retriever_k, filename="", **kwargs):
+        super().__init__(retriever_k)
+
         # init pyterrier
         import pyterrier as pt
         if not pt.started():
             pt.init()#boot_packages=["com.github.terrierteam:terrier-prf:-SNAPSHOT"])
 
-    def retrieve(self, rumor_id: str, claim: str, timeline: List[AuthorityPost], **kwargs) -> List:
+    def retrieve(self, rumor_id: str, claim: str, timeline: List[AuthorityPost], **kwargs) -> List[EvidenceRetrieverResult]:
         logger.info(f"retrieving documents for rumor_id: {rumor_id}")
         
         # do retrieval "on-the-fly"
@@ -54,6 +57,6 @@ class TerrierRetriever(EvidenceRetriever):
         ranked_results = []
         for row in rtr_df.itertuples():
             assert(rumor_id == row.qid) # should be the same
-            ranked_results.append([row.qid, row.docno, int(row.rank)+1, row.score]) 
+            ranked_results.append(EvidenceRetrieverResult(str(row.qid), str(row.docno), int(row.rank)+1, float(row.score)))
 
         return ranked_results

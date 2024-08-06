@@ -4,8 +4,11 @@ from csv import writer
 import numpy as np
 
 
-def strict_f1(actual, predicted, actual_evidence, predicted_evidence, label):
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
+
+def strict_f1(actual, predicted, actual_evidence, predicted_evidence, label):
     tp = 0
     fp = 0
     fn = 0
@@ -49,7 +52,6 @@ def strict_f1(actual, predicted, actual_evidence, predicted_evidence, label):
 
 
 def f1(actual, predicted, label):
-
     tp = 0
     fp = 0
     fn = 0
@@ -173,6 +175,7 @@ def eval_run_custom(pred_file, gold_file, out_file):
     )
     return (macro_F1, strict_macro_F1)
 
+
 def eval_run_custom_nofile(pred_list, gold_list):
     """
     basically the same, but without saving to file
@@ -211,16 +214,18 @@ def eval_run_custom_nofile(pred_list, gold_list):
     )
     return (macro_F1, strict_macro_F1)
 
+
 import pyterrier as pt
 import pyterrier.io as ptio
 import pyterrier.pipelines as ptpipelines
-from ir_measures import R, MAP    
+from ir_measures import R, MAP
 
 if not pt.started():
     pt.init()
 
+
 def eval_run_retrieval(pred_path, golden_path):
     golden = ptio.read_qrels(golden_path)
     pred = ptio._read_results_trec(pred_path)
-    eval = ptpipelines.Evaluate(pred, golden, metrics = [R@5,MAP], perquery=False)
+    eval = ptpipelines.Evaluate(pred, golden, metrics=[R @ 5, MAP], perquery=False)
     return eval
