@@ -10,22 +10,24 @@ logger = logging.getLogger(__name__)
 
 
 class OpenAIRetriever(EvidenceRetriever):
-    def __init__(self, retriever_k, api_key=None):
+    def __init__(
+        self, retriever_k, retriever_model="text-embedding-3-small", api_key=None
+    ):
         self.client = OpenAI(api_key=api_key or os.environ.get("OPENAI_API_KEY"))
-        logger.info(f'OpenAI client initialized with {"API key from .env" if api_key else "provided API key"}')
+        logger.info(
+            f'OpenAI client initialized with {"API key from .env" if api_key else "provided API key"}'
+        )
+
+        self.model = retriever_model
+
         super().__init__(retriever_k)
-        # todo: add retriever_model param
 
     def get_embedding(self, text):
-        response = self.client.embeddings.create(
-            input=text, model="text-embedding-3-small"
-        )
+        response = self.client.embeddings.create(input=text, model=self.model)
         return response.data[0].embedding
 
     def get_embedding_multiple(self, texts):
-        response = self.client.embeddings.create(
-            input=texts, model="text-embedding-3-small"
-        )
+        response = self.client.embeddings.create(input=texts, model=self.model)
         return [r.embedding for r in response.data]
 
     def retrieve(self, rumor_id, claim, timeline, **kwargs):
@@ -46,17 +48,18 @@ class OpenAIRetriever(EvidenceRetriever):
         ]
 
         # Select the top k most relevant tweets based on similarities
-        most_relevant_tweet_indices = np.argsort(similarities)[-self.k:][::-1]
+        most_relevant_tweet_indices = np.argsort(similarities)[-self.k :][::-1]
 
         scores = [similarities[i] for i in most_relevant_tweet_indices]
         relevant_tweets = [timeline[i] for i in most_relevant_tweet_indices]
 
         ranked_results = []
         for i, (cos_sim, tweet) in enumerate(zip(scores, relevant_tweets)):
-            ranked_results.append([rumor_id, tweet[1], i+1, cos_sim])
+            ranked_results.append([rumor_id, tweet[1], i + 1, cos_sim])
 
         return ranked_results
-    
+
+
 if __name__ == "__main__":
     import os
     from lkae.utils.data_loading import pkl_dir, load_pkl

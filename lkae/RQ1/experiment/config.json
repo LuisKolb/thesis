@@ -1,15 +1,36 @@
 {
     "configs": [
         {
-            "retriever_method": "tfidf",
-            "retriever_k": 5
-        },
-        {
             "retriever_method": "bm25",
             "retriever_k": 5
         },
         {
             "retriever_method": "ollama",
+            "retriever_k": 5,
+            "retriever_model": "mxbai-embed-large"
+        },
+        {
+            "retriever_method": "openai",
+            "retriever_k": 5,
+            "retriever_model": "text-embedding-3-small"
+        },
+        {
+            "retriever_method": "sent-transformers-hf",
+            "retriever_k": 5,
+            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1"
+        },
+        {
+            "retriever_method": "sent-transformers-local",
+            "retriever_k": 5,
+            "retriever_model": "all-MiniLM-L6-v2"
+        },
+        {
+            "retriever_method": "crossencoder",
+            "retriever_k": 5,
+            "retriever_model": "cross-encoder/stsb-roberta-large"
+        },
+        {
+            "retriever_method": "tfidf",
             "retriever_k": 5
         }
     ]

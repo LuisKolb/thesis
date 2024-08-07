@@ -52,7 +52,7 @@ def get_retriever(
 
     elif "OLLAMA" in retriever_method.upper():
         # additional optional parameters for OllamaEmbeddingRetriever
-        # model: mxbai-embed-large
+        # retriever_model: mxbai-embed-large
         from lkae.retrieval.methods.ollama_embeddings import OllamaEmbeddingRetriever
         retriever = OllamaEmbeddingRetriever(retriever_k, **kwargs)
 
@@ -72,20 +72,20 @@ def get_retriever(
     
     elif "SENT-TRANSFORMERS-HF" in retriever_method.upper():
         # additional optional parameters for HFSentenceTransformersRetriever
-        # model: "sentence-transformers/multi-qa-distilbert-cos-v1"
+        # retriever_model: "sentence-transformers/multi-qa-distilbert-cos-v1"
         # api_key: None
         from lkae.retrieval.methods.sent_transformers_hf import HFSentenceTransformersRetriever
         retriever = HFSentenceTransformersRetriever(retriever_k, **kwargs)
 
     elif "SENT-TRANSFORMERS-LOCAL" in retriever_method.upper():
         # additional optional parameters for SBERTRetriever
-        # embedding_model: "all-MiniLM-L6-v2"
+        # retriever_model: "all-MiniLM-L6-v2"
         from lkae.retrieval.methods.sent_transformers import SBERTRetriever
         retriever = SBERTRetriever(retriever_k, **kwargs)
 
     elif "CROSSENCODER" in retriever_method.upper():
         # additional optional parameters for CrossEncoderRetriever
-        # model: "cross-encoder/stsb-roberta-large"
+        # retriever_model: "cross-encoder/stsb-roberta-large"
         from lkae.retrieval.methods.sent_transformers import CrossEncoderRetriever
         retriever = CrossEncoderRetriever(retriever_k, **kwargs)
 

@@ -3,7 +3,8 @@ import os
 from transformers import pipeline, Pipeline
 import torch
 
-from lkae.verification.verify import BaseVerifier, VerificationResult
+from lkae.verification.types import VerificationResult
+from lkae.verification.verify import BaseVerifier
 
 class TransformersVerifier(BaseVerifier):
     def __init__(self, verifier_model: str = "roberta-large-mnli", **kwargs) -> None:

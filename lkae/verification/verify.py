@@ -1,20 +1,15 @@
 import re
-from typing import Callable, List, NamedTuple, Tuple
+from typing import List, Tuple
 from tqdm.auto import tqdm
 from lkae.utils.data_loading import AuredDataset, AuthorityPost
 
 import logging
 
-
+from lkae.verification.types import VerificationResult
 logger = logging.getLogger(__name__)
 
 # second logger for logging claim and evidence text score + judgement
 logger_text_score = logging.getLogger('lkae.verification.verify_log')
-
-class VerificationResult(NamedTuple):
-    label: str
-    score: float
-
 
 from abc import ABC, abstractmethod
 
@@ -113,15 +108,15 @@ class Judge(object):
 
 def get_verifier(verifier_method: str, **kwargs) -> BaseVerifier:
     if 'LLAMA3' in verifier_method.upper():
-        from lkae.verification.models.hf_llama3 import Llama3Verifier
-        return Llama3Verifier(**kwargs)
+        from lkae.verification.models.llama3_hf import HFLlama3Verifier
+        return HFLlama3Verifier(**kwargs)
 
     elif 'OPENAI' in verifier_method.upper():
-        from lkae.verification.models.open_ai import OpenaiVerifier
+        from lkae.verification.models.openai_verifier import OpenaiVerifier
         return OpenaiVerifier(**kwargs)
     
     elif 'OLLAMA' in verifier_method.upper():
-        from lkae.verification.models.ollama import OllamaVerifier
+        from lkae.verification.models.ollama_verifier import OllamaVerifier
         return OllamaVerifier(**kwargs)
     
     elif 'TRANSFORMERS' in verifier_method.upper():
@@ -207,7 +202,7 @@ def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge
                 }
             )
 
-    from lkae.verification.models.open_ai import OpenaiVerifier
+    from lkae.verification.models.openai_verifier import OpenaiVerifier
     
     if isinstance(verifier, OpenaiVerifier):
         logger_text_score.info(f'-----total token usage for verification-----')

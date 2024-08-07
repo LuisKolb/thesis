@@ -9,24 +9,28 @@ from lkae.utils.data_loading import AuthorityPost
 import logging
 logger = logging.getLogger(__name__)
 
+"""
+unused
+"""
 
-class HFSentenceTransformersRetriever(EvidenceRetriever):
+
+class HFCrossencoderRetriever(EvidenceRetriever):
     """
-    sentence-transformers via 🤗 Inference API (remotely)
+    crossencoder via 🤗 Inference API (remotely)
     see also: https://huggingface.co/docs/inference-endpoints/index
     """
 
     def __init__(
         self,
         retriever_k,
-        retriever_model="sentence-transformers/multi-qa-distilbert-cos-v1",
+        retriever_model="abbasgolestani/ag-nli-DeTS-sentence-similarity-v4",
         api_key="",
         **kwargs,
     ):
         self.model = retriever_model
         
         print(
-            f"Initializing HFSentenceTransformersRetriever with model: {self.model}"
+            f"Initializing HFCrossencoderRetriever with model: {self.model}"
         )
 
         self.api_key = api_key or os.environ.get("HF_API_KEY")
@@ -34,13 +38,13 @@ class HFSentenceTransformersRetriever(EvidenceRetriever):
         self.API_URL = f"https://api-inference.huggingface.co/models/{self.model}"
 
         self.query(
-            self.format_input("warm me up scotty", ["bzzt"])
+            self.format_input("warm me up scotty", "bzzt")
         )
 
         super().__init__(retriever_k)
 
-    def format_input(self, claim: str, tweets: List[str]) -> Dict:
-        return {"inputs": {"source_sentence": claim, "sentences": tweets}}
+    def format_input(self, claim: str, tweet: str) -> Dict:
+        return {"text": claim, "text_target": tweet}
 
     def retrieve(
         self, rumor_id: str, claim: str, timeline: List[AuthorityPost], **kwargs
@@ -49,9 +53,13 @@ class HFSentenceTransformersRetriever(EvidenceRetriever):
         tweets: List[str] = [t.text for t in timeline]
         tweet_ids: List[str] = [t.post_id for t in timeline]
 
-        similarity_scores = self.query(
-            self.format_input(claim, tweets)
-        )
+        similarity_scores = []
+
+        for tweet in tweets:
+            similarity_score_dict = self.query(
+                self.format_input(claim, tweet)
+            ) # return a dict in the form of {'label': 'LABEL_0', 'score': 0.08930326253175735}
+            similarity_scores.append(similarity_score_dict[0]["score"])
 
         # sort the timeline by similarity score
         sorted_timeline = sorted(
@@ -96,8 +104,8 @@ if __name__ == "__main__":
     ds = load_pkl(os.path.join(pkl_dir, "English_train", "pre-nam-bio.pkl"))
     sample = ds[0]
 
-    retriever = HFSentenceTransformersRetriever(
-        5, retriever_model="sentence-transformers/multi-qa-distilbert-cos-v1"
+    retriever = HFCrossencoderRetriever(
+        5, retriever_model="abbasgolestani/ag-nli-DeTS-sentence-similarity-v4"
     )
     data = retriever.retrieve(
         rumor_id=sample["id"], claim=sample["rumor"], timeline=sample["timeline"]

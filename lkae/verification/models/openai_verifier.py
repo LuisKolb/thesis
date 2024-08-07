@@ -10,7 +10,8 @@ from lkae.utils.data_loading import AuthorityPost
 
 import logging
 
-from lkae.verification.verify import BaseVerifier, VerificationResult
+from lkae.verification.types import VerificationResult
+from lkae.verification.verify import BaseVerifier
 logger = logging.getLogger(__name__)
 
 
