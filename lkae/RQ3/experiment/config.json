@@ -9,20 +9,38 @@
         {
             "retriever_method": "bm25",
             "retriever_k": 5,
-            "verifier_method": "openai"
+            "verifier_method": "transformers-bart",
+            "verifier_model": "facebook/bart-large-mnli"
         },
         {
-            "retriever_method": "sent-transformers-hf",
+            "retriever_method": "bm25",
             "retriever_k": 5,
-            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1",
-            "verifier_method": "transformers-roberta",
-            "verifier_model": "roberta-large-mnli"
+            "verifier_method": "llama3-8b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-8B-Instruct"
         },
         {
-            "retriever_method": "sent-transformers-hf",
+            "retriever_method": "bm25",
             "retriever_k": 5,
-            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1",
-            "verifier_method": "openai"
+            "verifier_method": "llama3-70b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-70B-Instruct"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "llama3-405b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-405B-Instruct"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "openai-4o-mini",
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "openai-4o",
+            "assistant_id": "asst_xDbPAMhYqIgD6E2uuPqe2TeO"
         }
     ]
 }

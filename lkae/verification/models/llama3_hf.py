@@ -64,10 +64,11 @@ class HFLlama3Verifier(BaseVerifier):
 
         result = self.query({"inputs": prompt})
 
-        if result and not isinstance(result, list) and "error" in result[0].keys():
-            time.sleep(3600)  # sleep for an hour is hourly rate limit reached'
-            print("hourly rate limit reached, sleeping for an hour")
-            result = self.query({"inputs": prompt})
+        # retrying/sleeping is now handled in query() function automatically
+        # if result and not isinstance(result, list) and "error" in result[0].keys():
+        #     time.sleep(3600)  # sleep for an hour is hourly rate limit reached'
+        #     print("hourly rate limit reached, sleeping for an hour")
+        #     result = self.query({"inputs": prompt})
 
         if (
             not result
@@ -75,7 +76,7 @@ class HFLlama3Verifier(BaseVerifier):
             or not isinstance(result[0], Mapping)
             or "generated_text" not in result[0]
         ):
-            print(f"ERROR: unexpected answer from API: {result}")
+            raise ValueError(f"ERROR: unexpected answer from API: {result}")
             return VerificationResult("NOT ENOUGH INFO", float(1))
 
         answer = result[0]["generated_text"][len(prompt) :]
@@ -98,18 +99,38 @@ class HFLlama3Verifier(BaseVerifier):
             )
             return VerificationResult("NOT ENOUGH INFO", float(1))
 
-    def query(self, payload):
+
+    def query(self, payload, retries=0):
+        if retries > 6:
+            raise ValueError(f"Error: too many retries ({retries})")
+        if retries > 0:
+            print(f"sleeping for {4**retries} seconds before retrying (retries={retries})")
+            time.sleep(4**retries) # sleep for 4^retries seconds; up to ~ 68 minutes at 6 retries (1h is the rate limit window)
         response = requests.post(self.API_URL, headers=self.headers, json=payload)
+        res_json = response.json()
+
+        # retries if error is returned from API
         if response.status_code != 200:
+
             if response.status_code == 503:
+                if not res_json.keys() or "estimated_time" not in res_json.keys():
+                    print(f"Error (503): {response.status_code}; Text: {response.text}; retrying... (retries={retries})")
+                    res_json = self.query(payload, retries+1)
                 # need to warm up the model, see https://huggingface.co/docs/api-inference/quicktour#model-loading-and-latency
-                res = response.json()
-                print(f"Waiting for model to warm up (for {float(res['estimated_time'])} seconds)")
-                time.sleep(float(res['estimated_time']))
-                response = requests.post(self.API_URL, headers=self.headers, json=payload)
+                print(f"Waiting for model to warm up (for {float(res_json['estimated_time'])} seconds)")
+                time.sleep(float(res_json['estimated_time']))
+                res_json = self.query(payload, retries=0) # reset retries to 0 since we already called sleep() in this case 
+
+            elif response.status_code >= 400 and response.status_code < 500:
+                # some kind of 4xx error, retry after sleeping (recursively)
+                print(f"Error (4xx): {response.status_code}; Text: {response.text}; retrying... (retries={retries})")
+                res_json = self.query(payload, retries+1)
+
             else:
                 raise ValueError(f"Error: {response.status_code}; Text: {response.text}")
-        return response.json()
+        
+        # return the response.json() dict
+        return res_json
 
 
 if __name__ == "__main__":

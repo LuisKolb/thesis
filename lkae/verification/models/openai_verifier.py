@@ -32,11 +32,11 @@ You must format your answer in JSON format, like this: {"decision": ["SUPPORTS"|
 No yapping.
 """ 
 
-    def __init__(self, api_key:str='', **kwargs) -> None:
+    def __init__(self, api_key:str='', assistant_id="asst_XRITdOybDfYpIr4fVevm6qYi", **kwargs) -> None:
         self.client = OpenAI(
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
-        self.assistant_id: str = "asst_XRITdOybDfYpIr4fVevm6qYi"
+        self.assistant_id: str = assistant_id
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0

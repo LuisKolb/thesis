@@ -62,7 +62,8 @@ class AuredDataset(object):
         preprocess,
         add_author_name,
         add_author_bio,
-        blind_run=True,
+        # blind_run=True,
+        blacklisted_rumor_ids=[],
         author_info_filepath="../../lkae/combined-author-data-translated.json",
         **kwargs,
     ) -> None:
@@ -84,6 +85,7 @@ class AuredDataset(object):
         self.add_author_name: bool = add_author_name
         self.add_author_bio: bool = add_author_bio
         self.author_info_filepath: str = author_info_filepath
+        self.blacklisted_rumor_ids: List[str] = blacklisted_rumor_ids
 
         self.load_rumor_data()
 
@@ -108,6 +110,8 @@ class AuredDataset(object):
 
         for item in jsons:
             entry = RumorWithEvidence(item)
+            if self.blacklisted_rumor_ids and entry["id"] in self.blacklisted_rumor_ids:
+                continue # skip blacklisted rumors
             entry["timeline"] = [AuthorityPost(*post, None, None) for post in entry["timeline"]]  # type: ignore
             if "evidence" in entry and entry["evidence"]:
                 entry["evidence"] = [AuthorityPost(*post, None, None) for post in entry["evidence"]]  # type: ignore

@@ -1,0 +1,10 @@
+{
+    "configs": [
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "llama3-405b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-405B-Instruct-FP8"
+        }
+    ]
+}

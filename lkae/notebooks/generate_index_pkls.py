@@ -2,6 +2,7 @@ import os
 import pickle as pkl
 
 from lkae.utils.data_loading import AuredDataset, root_dir
+from lkae.notebooks.generate_cull_list import cull_list
 
 def save_pkl(dir_path, file_name, ds: AuredDataset):
     if not os.path.exists(dir_path):
@@ -28,8 +29,8 @@ if __name__ == "__main__":
                     fingerprint += 'nam-' if config['add_author_name'] else 'nonam-'
                     fingerprint += 'bio' if config['add_author_bio'] else 'nobio'
 
-                    ds = AuredDataset(os.path.join(root_dir, 'data', file_name), **config)
+                    ds = AuredDataset(os.path.join(root_dir, 'data', file_name), blacklisted_rumor_ids=cull_list, **config)
 
                     save_pkl(os.path.join(root_dir, 'index', file_name.split('.')[0]),
-                            fingerprint,
-                            ds)
+                             fingerprint,
+                             ds)

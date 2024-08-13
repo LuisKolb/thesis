@@ -155,14 +155,25 @@ def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge
 
         if not item["retrieved_evidence"]:
             # only run fact check if we actually have retrieved evidence
-            logger.warn(f'key "retrieved_evidence" was empty for rumor with id {rumor_id}')
-            res_jsons.append(
-                {
-                    "id": rumor_id,
-                    "predicted_label": "NOT ENOUGH INFO",
-                    "predicted_evidence": [],
-                }
-            )
+            logger.info(f'key "retrieved_evidence" was empty for rumor with id {rumor_id}! this means there was no evidence to verify the rumor. predicting NOT ENOUGH INFO for this rumor.')
+            if blind:
+                res_jsons.append(
+                    {
+                        "id": rumor_id,
+                        "predicted_label": "NOT ENOUGH INFO",
+                        "predicted_evidence": [],
+                    }
+                )
+            elif not blind:
+                res_jsons.append(
+                    {
+                        "id": rumor_id,
+                        "label": label,
+                        "claim": claim,
+                        "predicted_label": "NOT ENOUGH INFO",
+                        "predicted_evidence": [],
+                    }
+                )
             continue
         
         retrieved_evidence = item["retrieved_evidence"] 

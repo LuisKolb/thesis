@@ -42,7 +42,14 @@ if __name__ == "__main__":
     ds = load_pkl(os.path.join(pkl_dir, 'English_train', 'pre-nam-bio.pkl'))
     sample = ds[0]
 
-    verifier = TransformersVerifier()
+    verifier = TransformersVerifier("roberta-large-mnli")
+
+    claim = sample['rumor']
+    evidence = sample['evidence'][0][2]
+    print(verifier.verify(claim, evidence))
+    print(sample['label'])
+
+    verifier = TransformersVerifier("facebook/bart-large-mnli")
 
     claim = sample['rumor']
     evidence = sample['evidence'][0][2]
