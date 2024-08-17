@@ -1,38 +1,18 @@
-from abc import ABC, abstractmethod
-import json
-from typing import List, NamedTuple
-from openai import OpenAI
-from openai.types.chat import ChatCompletion
-
-import re
 import os
-from lkae.utils.data_loading import AuthorityPost
-
-import logging
+import json
+from openai import OpenAI
 
 from lkae.verification.types import VerificationResult
 from lkae.verification.verify import BaseVerifier
+from lkae.verification.models._llm_sys_message import sys_message
+
+import logging
 logger = logging.getLogger(__name__)
 
 
 class OpenaiVerifier(BaseVerifier):
-    client: OpenAI
-    valid_labels: List =  [
-            "REFUTES",
-            "NOT ENOUGH INFO",
-            "SUPPORTS"
-        ]
-    system_message: str = \
-"""You are a helpful assistant doing simple reasoning tasks.
-You will be given a statement and a claim.
-You need to decide if a statement either supports the given claim ("SUPPORTS"), refutes the claim ("REFUTES"), or if the statement is not related to the claim ("NOT ENOUGH INFO"). 
-USE ONLY THE STATEMENT AND THE CLAIM PROVIDED BY THE USER TO MAKE YOUR DECISION.
-You must also provide a confidence score between 0 and 1, indicating how confident you are in your decision.
-You must format your answer in JSON format, like this: {"decision": ["SUPPORTS"|"REFUTES"|"NOT ENOUGH INFO"], "confidence": [0...1]}
-No yapping.
-""" 
 
-    def __init__(self, api_key:str='', assistant_id="asst_XRITdOybDfYpIr4fVevm6qYi", **kwargs) -> None:
+    def __init__(self, api_key:str='', assistant_id="asst_XRITdOybDfYpIr4fVevm6qYi", temperature=0.2, top_p=1, **kwargs) -> None:
         self.client = OpenAI(
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
@@ -40,30 +20,27 @@ No yapping.
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0
-    
-    # def get_completion(self, input_message) -> ChatCompletion:
-    #     completion = self.client.chat.completions.create(
-    #         model="gpt-4-turbo-preview",
-    #         messages=[
-    #             {"role": "system", "content": self.system_message},
-    #             {"role": "user", "content": input_message}
-    #         ],
-    #         temperature=0.2
-    #     )
+        
+        self.system_message = sys_message
+        self.temperature = temperature
+        self.top_p = top_p
+        
+        self.valid_labels = ["REFUTES", "NOT ENOUGH INFO", "SUPPORTS"]
 
-    #     return completion
     
     def get_assistant_response(self, input_message):
         thread = self.client.beta.threads.create()
         message = self.client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
-            content=input_message
+            content=input_message,
         )
 
         run = self.client.beta.threads.runs.create_and_poll(
             thread_id=thread.id,
             assistant_id=self.assistant_id,
+            temperature=self.temperature,
+            top_p=self.top_p
         )
 
         if run.status == 'completed':
@@ -80,7 +57,7 @@ No yapping.
                         return messages.data[0].content[0].text.value # type: ignore
         else:
             logger.warn(f'run failed with status: {run.status}, returning NOT ENOUGH INFO answer')
-            return '{"decision": "NOT ENOUGH INFO", confidence": 1.0}'
+            return '{"decision": "NOT ENOUGH INFO", confidence": 1.0}' # need to return a string that can be json-parsed
 
     
     def verify(self, claim: str, evidence: str) -> VerificationResult:

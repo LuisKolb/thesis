@@ -1,4 +1,4 @@
-from typing import Generator, List, TypedDict, Union, Optional, NamedTuple
+from typing import Generator, List, TypedDict, Union, Optional, NamedTuple, Dict
 import json
 import os
 import re
@@ -347,3 +347,28 @@ def load_pkl(file_path) -> AuredDataset:
         raise FileNotFoundError(f"file {file_path} does not exist")
     with open(file_path, "rb") as file:
         return pkl.load(file)
+
+
+def load_pkls(index_dir: str = pkl_dir) -> Dict[str, Dict[str, AuredDataset]]:
+    """
+    load all pkl files in a directory and return a dict with mapping
+    {dataset_split: dataset}
+    """
+
+    datasets = {}
+    datasets = {}
+
+    for subdir in os.listdir(index_dir):
+        if not os.path.isdir(os.path.join(index_dir, subdir)):
+            continue
+
+        datasets[subdir] = {}
+
+        for filename in os.listdir(os.path.join(index_dir, subdir)):
+            if not filename.endswith('.pkl'):
+                continue
+            
+            key = os.path.join(subdir, filename)
+            datasets[subdir][filename.split('.')[0]] = load_pkl(os.path.join(index_dir, key))
+
+    return datasets

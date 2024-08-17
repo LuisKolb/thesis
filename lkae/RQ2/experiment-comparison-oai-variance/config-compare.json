@@ -1,0 +1,16 @@
+{
+    "configs": [
+        {
+            "verifier_method": "openai-4o-mini-run1",
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+        },
+        {
+            "verifier_method": "openai-4o-mini-run2",
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+        },
+        {
+            "verifier_method": "openai-4o-mini-run3",
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+        }
+    ]
+}

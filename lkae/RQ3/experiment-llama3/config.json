@@ -1,0 +1,22 @@
+{
+    "configs": [
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "llama3-405b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-405B-Instruct"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "llama3-8b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-8B-Instruct"
+        },
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5,
+            "verifier_method": "llama3-70b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-70B-Instruct"
+        }
+    ]
+}

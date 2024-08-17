@@ -1,0 +1,5 @@
+,Macro-F1,Strict-Macro-F1,Retrieval_Method,Verifier_Method,DS_Settings,Time (s)
+0,0.43614718614718617,0.40616999487967226,bm25,transformers-roberta,pre-nonam-nobio,10.86955189704895
+1,0.8968253968253967,0.882716049382716,bm25,openai,pre-nonam-nobio,526.5452983379364
+2,0.5628019323671497,0.5014992503748126,sent-transformers-hf,transformers-roberta,pre-nonam-nobio,132.5259141921997
+3,0.8968253968253967,0.8799171842650103,sent-transformers-hf,openai,pre-nonam-nobio,564.810798406601
