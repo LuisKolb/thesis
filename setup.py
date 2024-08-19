@@ -16,10 +16,10 @@ setup(
         "ir-measures",
         "jsonlines",
         "openai",
-        "plotly",
-        "matplotlib",
+        # "plotly",
+        # "matplotlib",
         "transformers",
         "sentence-transformers"
     ],
-    packages=find_packages(".", ["lkae/*"]),
+    packages=find_packages(where=".", include=["lkae/*"]),
 )

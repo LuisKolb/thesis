@@ -5,8 +5,8 @@
 (install miniconda, checking the box too add it to PATH: https://docs.anaconda.com/free/miniconda/) and restart the command prompt
 
 ```
-conda create -n clef python=3.10
-conda activate clef
+conda create -n thesis python=3.10
+conda activate thesis
 ```
 
 then install torch with CUDA (will probably differ on your machine; setup.py does not allow a custom index_url, so this has to be done manually):
