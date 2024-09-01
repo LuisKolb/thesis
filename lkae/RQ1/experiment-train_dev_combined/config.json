@@ -5,28 +5,25 @@
             "retriever_k": 5
         },
         {
+            "retriever_method": "tfidf",
+            "retriever_k": 5
+        },
+        {
             "retriever_method": "openai",
             "retriever_k": 5,
             "retriever_model": "text-embedding-3-small"
         },
         {
-            "retriever_method": "sent-transformers-hf",
+            "retriever_method": "rerank-sbert-crossencoder",
             "retriever_k": 5,
-            "retriever_model": "sentence-transformers/multi-qa-distilbert-cos-v1"
+            "rerank_cutoff": 50,
+            "embedding_model": "sentence-transformers/msmarco-distilbert-cos-v5", 
+            "reranking_model": "cross-encoder/ms-marco-MiniLM-L-6-v2"
         },
         {
-            "retriever_method": "sent-transformers-local",
+            "retriever_method": "rerank-nv-embed-v1",
             "retriever_k": 5,
-            "retriever_model": "all-MiniLM-L6-v2"
-        },
-        {
-            "retriever_method": "crossencoder",
-            "retriever_k": 5,
-            "retriever_model": "cross-encoder/stsb-roberta-large"
-        },
-        {
-            "retriever_method": "tfidf",
-            "retriever_k": 5
+            "retriever_model": "nvidia/nv-embed-v1"
         }
     ]
 }

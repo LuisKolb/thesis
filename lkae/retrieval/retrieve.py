@@ -1,10 +1,8 @@
 from typing import Dict, List
-from abc import ABC, abstractmethod
 from lkae.retrieval.types import EvidenceRetriever, EvidenceRetrieverResult
 from lkae.utils.data_loading import AuredDataset
 
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -83,12 +81,6 @@ def get_retriever(
         from lkae.retrieval.methods.sent_transformers import SBERTRetriever
         retriever = SBERTRetriever(retriever_k, **kwargs)
 
-    elif "CROSSENCODER" in retriever_method.upper():
-        # additional optional parameters for CrossEncoderRetriever
-        # retriever_model: "cross-encoder/stsb-roberta-large"
-        from lkae.retrieval.methods.sent_transformers import CrossEncoderRetriever
-        retriever = CrossEncoderRetriever(retriever_k, **kwargs)
-
     elif "TERRIER" in retriever_method.upper():
         # additional optional parameters for TerrierRetriever
         # filename: ""
@@ -99,6 +91,21 @@ def get_retriever(
         # no additional optional parameters for TFIDFRetriever
         from lkae.retrieval.methods.tfidf import TFIDFRetriever
         retriever = TFIDFRetriever(retriever_k, **kwargs)
+
+    elif "RERANK-NV" in retriever_method.upper():
+        # additional optional parameters for NVRetrieverV1Hosted
+        # retriever_model: "nvidia/nv-embed-v1"
+        from lkae.retrieval.methods.rerank_bm25_nv import RerankingRetriever
+        retriever = RerankingRetriever(retriever_k, **kwargs)
+
+    elif "RERANK-SBERT" in retriever_method.upper():
+        # additional optional parameters for CrossEncoderRerankRetriever
+        # retriever_k
+        # rerank_cutoff=20
+        # embedding_model="sentence-transformers/msmarco-distilbert-cos-v5"
+        # reranking_model="cross-encoder/ms-marco-MiniLM-L-6-v2"
+        from lkae.retrieval.methods.rerank_sbert import CrossEncoderRerankRetriever
+        retriever = CrossEncoderRerankRetriever(retriever_k, **kwargs)
 
     else:
         raise ValueError(f"Invalid retriever method: {retriever_method}")

@@ -2,15 +2,21 @@
     "configs": [
         {
             "verifier_method": "openai-4o-mini-run1",
-            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi",
+            "temperature": 0.01,
+            "top_p": 0.5
         },
         {
             "verifier_method": "openai-4o-mini-run2",
-            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi",
+            "temperature": 0.01,
+            "top_p": 0.5
         },
         {
             "verifier_method": "openai-4o-mini-run3",
-            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi"
+            "assistant_id": "asst_XRITdOybDfYpIr4fVevm6qYi",
+            "temperature": 0.01,
+            "top_p": 0.5
         }
     ]
 }

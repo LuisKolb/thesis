@@ -5,9 +5,9 @@
             "retriever_k": 5
         },
         {
-            "retriever_method": "rerank-sbert-crossencoder",
+            "retriever_method": "rerank-nv-embed-v1",
             "retriever_k": 5,
-            "rerank_cutoff": 40
+            "retriever_model": "nvidia/nv-embed-v1"
         }
     ]
 }

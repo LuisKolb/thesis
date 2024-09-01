@@ -143,6 +143,11 @@ if __name__ == "__main__":
     claim = sample["rumor"]
     evidence = sample["evidence"][0][2]
 
+    verifier3 = HFLlama3Verifier(
+        verifier_model="meta-llama/Meta-Llama-3.1-8B-Instruct"
+    )
+    print(verifier3.verify(claim, evidence))
+
     verifier1 = HFLlama3Verifier(
         verifier_model="meta-llama/Meta-Llama-3.1-405B-Instruct"
     )
@@ -153,9 +158,5 @@ if __name__ == "__main__":
     )
     print(verifier2.verify(claim, evidence))
 
-    verifier3 = HFLlama3Verifier(
-        verifier_model="meta-llama/Meta-Llama-3.1-8B-Instruct"
-    )
-    print(verifier3.verify(claim, evidence))
 
 

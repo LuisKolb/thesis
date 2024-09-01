@@ -215,16 +215,17 @@ def eval_run_custom_nofile(pred_list, gold_list):
     return (macro_F1, strict_macro_F1)
 
 
-import pyterrier as pt
-import pyterrier.io as ptio
-import pyterrier.pipelines as ptpipelines
-from ir_measures import R, MAP
 
-if not pt.started():
-    pt.init()
 
 
 def eval_run_retrieval(pred_path, golden_path):
+    import pyterrier as pt
+    import pyterrier.io as ptio
+    import pyterrier.pipelines as ptpipelines
+    from ir_measures import R, MAP
+
+    if not pt.started():
+        pt.init()
     golden = ptio.read_qrels(golden_path)
     pred = ptio._read_results_trec(pred_path)
     eval = ptpipelines.Evaluate(pred, golden, metrics=[R @ 5, MAP], perquery=False)
