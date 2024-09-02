@@ -74,7 +74,7 @@ class OpenaiVerifier(BaseVerifier):
                 logger.warn(f'could not json-parse response from openai model: {answer}')
                 return VerificationResult("NOT ENOUGH INFO", 1.0)
 
-        if decision and decision in self.valid_labels:
+        if decision and (decision in self.valid_labels):
             return VerificationResult(decision, confidence)
         else:
             return VerificationResult("NOT ENOUGH INFO", 1.0)

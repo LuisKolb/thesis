@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import json
 import requests
 from collections.abc import Mapping
 
@@ -80,27 +81,50 @@ class HFLlama3Verifier(BaseVerifier):
 
         answer = result[0]["generated_text"][len(prompt) :]
 
-            
-
-        regex_pattern = r'(\n|\s)*{(\n|\s)*"decision"(\n|\s)*:(\n|\s)*"([^"]*)"(\n|\s)*,(\n|\s)*"confidence"(\n|\s)*:(\n|\s)*(\d*.*.\d*)(\n|\s)*\}(\n|\s)*'
-
-        match = re.search(regex_pattern, answer)
-
-        if match:
-            label = match.group(5)
-            confidence = match.group(10)
-            # remove quotes from confidence before converting, if present (for example: confidence='"1"')
-            confidence = float(confidence.strip('"'))
-            if label in self.valid_labels:
-                return VerificationResult(label, confidence)
+        try:
+            decision, confidence = json.loads(answer).values()
+            if decision and (decision in self.valid_labels):
+                return VerificationResult(decision, confidence)
             else:
-                print(f'ERROR: unkown label "{label}" in answer: {answer}')
-                return VerificationResult("NOT ENOUGH INFO", float(1))
-        else:
-            print(
-                f"ERROR: could not find the answer format in answer from model: {answer}"
-            )
+                return VerificationResult("NOT ENOUGH INFO", 1.0)
+        except ValueError:
+            if ('\n' in answer):
+                answer = answer.split('\n')[0]
+                try:
+                    decision, confidence = json.loads(answer).values()
+                    if decision and (decision in self.valid_labels):
+                        return VerificationResult(decision, confidence)
+                    else:
+                        return VerificationResult("NOT ENOUGH INFO", 1.0)
+                except ValueError:
+                    if ('\n' in answer):
+                        answer = answer.split('\n')[0]
+                        
+                    print(f"ERROR: could not decode answer from model: {answer}")
+                    return VerificationResult("NOT ENOUGH INFO", float(1))
+
+            print(f"ERROR: could not decode answer from model: {answer}")
             return VerificationResult("NOT ENOUGH INFO", float(1))
+
+        # regex_pattern = r'(\n|\s)*{(\n|\s)*"decision"(\n|\s)*:(\n|\s)*"([^"]*)"(\n|\s)*,(\n|\s)*"confidence"(\n|\s)*:(\n|\s)*(\d*.*.\d*)(\n|\s)*\}(\n|\s)*'
+
+        # match = re.search(regex_pattern, answer)
+
+        # if match:
+        #     label = match.group(5)
+        #     confidence = match.group(10)
+        #     # remove quotes from confidence before converting, if present (for example: confidence='"1"')
+        #     confidence = float(confidence.strip('"'))
+        #     if label in self.valid_labels:
+        #         return VerificationResult(label, confidence)
+        #     else:
+        #         print(f'ERROR: unkown label "{label}" in answer: {answer}')
+        #         return VerificationResult("NOT ENOUGH INFO", float(1))
+        # else:
+        #     print(
+        #         f"ERROR: could not find the answer format in answer from model: {answer}"
+        #     )
+        #     return VerificationResult("NOT ENOUGH INFO", float(1))
 
 
     def query(self, payload, retries=0):
