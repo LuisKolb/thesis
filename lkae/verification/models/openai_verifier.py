@@ -2,8 +2,7 @@ import os
 import json
 from openai import OpenAI
 
-from lkae.verification.types import VerificationResult
-from lkae.verification.verify import BaseVerifier
+from lkae.verification.types import VerificationResult, BaseVerifier 
 from lkae.verification.models._llm_sys_message import sys_message
 
 import logging
@@ -16,6 +15,7 @@ class OpenaiVerifier(BaseVerifier):
         self.client = OpenAI(
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
+
         self.assistant_id: str = assistant_id
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
@@ -57,7 +57,7 @@ class OpenaiVerifier(BaseVerifier):
                         return messages.data[0].content[0].text.value # type: ignore
         else:
             logger.warn(f'run failed with status: {run.status}, returning NOT ENOUGH INFO answer')
-            return '{"decision": "NOT ENOUGH INFO", confidence": 1.0}' # need to return a string that can be json-parsed
+            return '{"decision": "NOT ENOUGH INFO", "confidence": 1.0}' # need to return a string that can be json-parsed
 
     
     def verify(self, claim: str, evidence: str) -> VerificationResult:

@@ -1,12 +1,8 @@
 {
     "configs": [
         {
-            "verifier_method": "sbert-deberta-tasksource", 
-            "verifier_model": "tasksource/deberta-small-long-nli"
-        },
-        {
             "verifier_method": "transformers-roberta",
-            "verifier_model": "FacebookAI/roberta-large-mnli"
+            "verifier_model": "roberta-large-mnli"
         },
         {
             "verifier_method": "transformers-bart",
@@ -19,6 +15,10 @@
         {
             "verifier_method": "llama3-70b",
             "verifier_model": "meta-llama/Meta-Llama-3.1-70B-Instruct"
+        },
+        {
+            "verifier_method": "llama3-405b",
+            "verifier_model": "meta-llama/Meta-Llama-3.1-405B-Instruct"
         },
         {
             "verifier_method": "openai-4o-mini",

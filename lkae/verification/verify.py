@@ -5,22 +5,12 @@ from lkae.utils.data_loading import AuredDataset, AuthorityPost
 
 import logging
 
-from lkae.verification.types import VerificationResult
+from lkae.verification.types import BaseVerifier, VerificationResult
 logger = logging.getLogger(__name__)
 
 # second logger for logging claim and evidence text score + judgement
 logger_text_score = logging.getLogger('lkae.verification.verify_log')
 
-from abc import ABC, abstractmethod
-
-class BaseVerifier(ABC):
-    @abstractmethod
-    def verify(self, claim: str, evidence: str, **kwargs) -> VerificationResult:
-        """Verify a claim based on the evidence."""
-        pass
-    
-    def __call__(self, claim: str, evidence: str, **kwargs) -> VerificationResult:
-        return self.verify(claim, evidence, **kwargs)
 
 class Judge(object):
     scale: bool
@@ -108,20 +98,41 @@ class Judge(object):
 
 def get_verifier(verifier_method: str, **kwargs) -> BaseVerifier:
     if 'LLAMA3' in verifier_method.upper():
+        # additional optional parameters for LLAMA3Verifier
+        # api_key: str = ""
+        # verifier_model: str = "meta-llama/Meta-Llama-3-70B-Instruct"
         from lkae.verification.models.llama3_hf import HFLlama3Verifier
         return HFLlama3Verifier(**kwargs)
 
     elif 'OPENAI' in verifier_method.upper():
+        # additional optional parameters for OpenaiVerifier
+        # api_key: str = ""
+        # assistant_id: str = "asst_XRITdOybDfYpIr4fVevm6qYi"
+        # temperature = 0.2
+        # top_p = 1
         from lkae.verification.models.openai_verifier import OpenaiVerifier
         return OpenaiVerifier(**kwargs)
     
     elif 'OLLAMA' in verifier_method.upper():
+        # additional optional parameters for OpenaiVerifier
+        # verifier_model = "llama3:instruct"
+        # temperature = 0.2
+        # top_p = 1
         from lkae.verification.models.ollama_verifier import OllamaVerifier
         return OllamaVerifier(**kwargs)
     
     elif 'TRANSFORMERS' in verifier_method.upper():
+        # additional optional parameters for TransformersVerifier
+        # verifier_model = "facebook/bart-large-mnli"
+        # task = "zero-shot-classification"
         from lkae.verification.models.transformers_verifier import TransformersVerifier
         return TransformersVerifier(**kwargs)
+    
+    elif 'DEBERTA' in verifier_method.upper():
+        # additional optional parameters for TransformersVerifier
+        # verifier_model = "tasksource/deberta-small-long-nli"
+        from lkae.verification.models.deberta_verifier import DebertaVerifier
+        return DebertaVerifier(**kwargs)
 
     else:
         raise ValueError(f"Invalid verifier method: {verifier_method}")
