@@ -80,6 +80,8 @@ class HFLlama3Verifier(BaseVerifier):
 
         answer = result[0]["generated_text"][len(prompt) :]
 
+            
+
         regex_pattern = r'(\n|\s)*{(\n|\s)*"decision"(\n|\s)*:(\n|\s)*"([^"]*)"(\n|\s)*,(\n|\s)*"confidence"(\n|\s)*:(\n|\s)*(\d*.*.\d*)(\n|\s)*\}(\n|\s)*'
 
         match = re.search(regex_pattern, answer)
@@ -125,6 +127,7 @@ class HFLlama3Verifier(BaseVerifier):
             elif response.status_code >= 400 and response.status_code < 500:
                 if response.status_code == 429:
                     # rate limit reached for PRO usage, sleep for an hour
+                    print(f'Error (429): {response.status_code}; Text: {response.text}; sleeping 1 hour...')
                     time.sleep(60*60*1.1)
                     res_json = self.query(payload, retries=0) # reset retries to 0 since we already called sleep() in this case 
                 # some kind of 4xx error, retry after sleeping (recursively)
@@ -148,20 +151,21 @@ if __name__ == "__main__":
     claim = sample["rumor"]
     evidence = sample["evidence"][0][2]
 
-    verifier3 = HFLlama3Verifier(
-        verifier_model="meta-llama/Meta-Llama-3.1-8B-Instruct"
-    )
-    print(verifier3.verify(claim, evidence))
+    # verifier1 = HFLlama3Verifier(
+    #     verifier_model="meta-llama/Meta-Llama-3.1-405B-Instruct-FP8"
+    # )
+    # print(verifier1.verify(claim, evidence))
 
-    verifier1 = HFLlama3Verifier(
-        verifier_model="meta-llama/Meta-Llama-3.1-405B-Instruct"
-    )
-    print(verifier1.verify(claim, evidence))
-    
+   
     verifier2 = HFLlama3Verifier(
         verifier_model="meta-llama/Meta-Llama-3.1-70B-Instruct"
     )
     print(verifier2.verify(claim, evidence))
+
+    verifier3 = HFLlama3Verifier(
+        verifier_model="meta-llama/Meta-Llama-3.1-8B-Instruct"
+    )
+    print(verifier3.verify(claim, evidence))
 
 
 

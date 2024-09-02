@@ -159,7 +159,7 @@ def judge_using_evidence(rumor_id, claim: str, evidence: List[AuthorityPost], ve
 def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge: Judge, blind: bool = False) -> List:
     res_jsons = []
 
-    for i, item in enumerate(dataset):
+    for i, item in enumerate(pbar := tqdm(dataset)):
         rumor_id = item["id"]
         if not blind: label = item["label"]
         claim = item["rumor"]
