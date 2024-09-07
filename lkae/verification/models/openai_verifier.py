@@ -16,7 +16,13 @@ class OpenaiVerifier(BaseVerifier):
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
 
-        self.assistant_id: str = assistant_id
+        self.model: str = assistant_id
+
+        self.model_to_cost_map = {
+            "asst_XRITdOybDfYpIr4fVevm6qYi": {"input_token_price": 0.00500, "output_token_price": 0.01500, "per_n_tokens": 1000}, # 4o
+            "asst_xDbPAMhYqIgD6E2uuPqe2TeO": {"input_token_price": 0.000150, "output_token_price": 0.000600, "per_n_tokens": 1000}, # 4o-mini
+        }
+
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0
@@ -27,6 +33,8 @@ class OpenaiVerifier(BaseVerifier):
         
         self.valid_labels = ["REFUTES", "NOT ENOUGH INFO", "SUPPORTS"]
 
+    def supports_token_count(self) -> bool:
+        return True
     
     def get_assistant_response(self, input_message):
         thread = self.client.beta.threads.create()
@@ -38,7 +46,7 @@ class OpenaiVerifier(BaseVerifier):
 
         run = self.client.beta.threads.runs.create_and_poll(
             thread_id=thread.id,
-            assistant_id=self.assistant_id,
+            assistant_id=self.model,
             temperature=self.temperature,
             top_p=self.top_p
         )

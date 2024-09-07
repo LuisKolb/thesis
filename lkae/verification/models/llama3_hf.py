@@ -48,6 +48,9 @@ class HFLlama3Verifier(BaseVerifier):
 
         self.query({"inputs": prompt})
 
+    def supports_token_count(self) -> bool:
+        return False
+
     def verify(self, claim: str, evidence: str) -> VerificationResult:
         input_text = f'"{evidence}"\n\nClaim: "{claim}"'
 

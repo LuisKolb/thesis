@@ -22,6 +22,9 @@ class TransformersVerifier(BaseVerifier):
             "NEUTRAL": "NOT ENOUGH INFO",
             "CONTRADICTION": "REFUTES"
         }
+
+    def supports_token_count(self) -> bool:
+        return False
         
     
     def verify(self, claim: str, evidence: str) -> VerificationResult:

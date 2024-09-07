@@ -13,12 +13,16 @@
             "verifier_model": "facebook/bart-large-mnli"
         },
         {
-            "verifier_method": "llama3-8b",
-            "verifier_model": "meta-llama/Meta-Llama-3.1-8B-Instruct"
+            "verifier_method": "llama3-1-8B",
+            "verifier_model": "Meta-Llama-3.1-8B-Instruct"
         },
         {
-            "verifier_method": "llama3-70b",
-            "verifier_model": "meta-llama/Meta-Llama-3.1-70B-Instruct"
+            "verifier_method": "llama3-1-70b",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct"
+        },
+        {
+            "verifier_method": "llama3-1-405b",
+            "verifier_model": "Meta-Llama-3.1-405B-Instruct"
         },
         {
             "verifier_method": "openai-4o-mini",

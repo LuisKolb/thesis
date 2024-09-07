@@ -28,7 +28,9 @@ class OllamaVerifier(BaseVerifier):
 
         self.system_message = sys_message
         self.valid_labels = ["REFUTES", "NOT ENOUGH INFO", "SUPPORTS"]
-    
+
+    def supports_token_count(self) -> bool:
+        return False
 
     def get_completion(self, input_message) -> ChatCompletion:
         completion = self.client.chat.completions.create(

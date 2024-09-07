@@ -19,7 +19,8 @@ setup(
         # "plotly",
         # "matplotlib",
         "transformers",
-        "sentence-transformers"
+        "sentence-transformers",
+        "azure-ai-inference"
     ],
     packages=find_packages(where=".", include=["lkae/*"]),
 )

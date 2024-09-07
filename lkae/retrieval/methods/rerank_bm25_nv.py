@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class RerankingRetriever(EvidenceRetriever):
 
     def __init__(
-            self, retriever_k, b=0.75, k1=1.6, rerank_cutoff=50, retriever_model="nvidia/nv-embed-v1", api_key=None
+            self, retriever_k, b=0.75, k1=1.6, rerank_cutoff=50, retriever_model="nvidia/nv-embed-v1", api_key=None, **kwargs
     ):
         self.vectorizer = TfidfVectorizer(norm=None, smooth_idf=False)
         self.bm25_b = b

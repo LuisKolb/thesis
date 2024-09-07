@@ -2,16 +2,6 @@
     "configs": [
         {
             "retriever_method": "rerank-nv-embed-v1",
-            "verifier_method": "llama3-8b",
-            "verifier_model": "meta-llama/Meta-Llama-3.1-8B-Instruct"
-        },
-        {
-            "retriever_method": "rerank-nv-embed-v1",
-            "verifier_method": "llama3-70b",
-            "verifier_model": "meta-llama/Meta-Llama-3.1-70B-Instruct"
-        },
-        {
-            "retriever_method": "rerank-nv-embed-v1",
             "verifier_method": "transformers-roberta",
             "verifier_model": "FacebookAI/roberta-large-mnli"
         },
@@ -29,6 +19,24 @@
             "retriever_method": "rerank-nv-embed-v1",
             "verifier_method": "openai-4o",
             "assistant_id": "asst_xDbPAMhYqIgD6E2uuPqe2TeO"
+        },
+        {
+            "retriever_method": "rerank-nv-embed-v1",
+            "retriever_k": 5,
+            "verifier_method": "llama3-1-8b",
+            "verifier_model": "Meta-Llama-3.1-8B-Instruct"
+        },
+        {
+            "retriever_method": "rerank-nv-embed-v1",
+            "retriever_k": 5,
+            "verifier_method": "llama3-1-70b",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct"
+        },
+        {
+            "retriever_method": "rerank-nv-embed-v1",
+            "retriever_k": 5,
+            "verifier_method": "llama3-1-405b",
+            "verifier_model": "Meta-Llama-3.1-405B-Instruct"
         }
     ]
 }

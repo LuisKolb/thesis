@@ -99,10 +99,11 @@ class Judge(object):
 def get_verifier(verifier_method: str, **kwargs) -> BaseVerifier:
     if 'LLAMA3' in verifier_method.upper():
         # additional optional parameters for LLAMA3Verifier
-        # api_key: str = ""
-        # verifier_model: str = "meta-llama/Meta-Llama-3-70B-Instruct"
-        from lkae.verification.models.llama3_hf import HFLlama3Verifier
-        return HFLlama3Verifier(**kwargs)
+        # verifier_model = "Meta-Llama-3.1-405B-Instruct"
+        # temperature = 0.2
+        # top_p = 1
+        from lkae.verification.models.llama3_azure_ai import Llama3AzureVerifier
+        return Llama3AzureVerifier(**kwargs)
 
     elif 'OPENAI' in verifier_method.upper():
         # additional optional parameters for OpenaiVerifier
@@ -224,19 +225,19 @@ def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge
                 }
             )
 
-    from lkae.verification.models.openai_verifier import OpenaiVerifier
     
-    if isinstance(verifier, OpenaiVerifier):
+    if verifier.supports_token_count():
         logger_text_score.info(f'-----total token usage for verification-----')
         logger_text_score.info(f'total tokens:\t{verifier.total_tokens_used}')
         logger_text_score.info(f'prompt tokens:\t{verifier.prompt_tokens_used}')
         logger_text_score.info(f'completion tokens:\t{verifier.completion_tokens_used}')
-        logger_text_score.info(f'price estimate:\t${((verifier.prompt_tokens_used/1000)*0.01) + ((verifier.completion_tokens_used/1000)*0.03)}')
+        pricing_map = verifier.model_to_cost_map[verifier.model]
+        logger_text_score.info(f'price estimate:\t${((verifier.prompt_tokens_used/pricing_map["per_n_tokens"])*pricing_map["input_token_price"]) + ((verifier.completion_tokens_used/pricing_map["per_n_tokens"])*pricing_map["output_token_price"])}')
         print(f'-----total token usage for verification-----')
         print(f'total tokens:\t{verifier.total_tokens_used}')
         print(f'prompt tokens:\t{verifier.prompt_tokens_used}')
         print(f'completion tokens:\t{verifier.completion_tokens_used}')
-        print(f'price estimate:\t${((verifier.prompt_tokens_used/1000)*0.01) + ((verifier.completion_tokens_used/1000)*0.03)}')
+        print(f'price estimate:\t${((verifier.prompt_tokens_used/pricing_map["per_n_tokens"])*pricing_map["input_token_price"]) + ((verifier.completion_tokens_used/pricing_map["per_n_tokens"])*pricing_map["output_token_price"])}')
     return res_jsons
 
 
