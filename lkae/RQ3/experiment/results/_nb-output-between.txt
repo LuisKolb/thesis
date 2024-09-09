@@ -1,0 +1,68 @@
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: REFUTES: 0.7
+ERROR: could not find the answer format in answer from model: {"REFUTES", 0.85}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: REFUTES, Confidence: 0.9
+
+The statement does not mention a Qatari being killed in Tunisia, nor does it mention the city of Bizerte. The statement actually talks about the humanitarian situation in Palestine, which suggests that it is unrelated to the claim.
+ERROR: could not find the answer format in answer from model: {"REFUTES", 0.8}
+ERROR: could not find the answer format in answer from model: REFUTES, 1
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.6}
+ERROR: could not find the answer format in answer from model: REFUTES: 0.8
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: REFUTES, 0.65
+ERROR: could not find the answer format in answer from model: SUPPORTS, Confidence: 0.9
+ERROR: could not find the answer format in answer from model: {"SUPPORTS", confidence: 0.9}
+ERROR: could not find the answer format in answer from model: {"SUPPORTS", 0.98}
+ERROR: could not find the answer format in answer from model: {"answer": "NOT ENOUGH INFO", "confidence": 0.8}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"NOT ENOUGH INFO", 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES", confidence: 0.95}
+ERROR: could not find the answer format in answer from model: NOT ENOUGH INFO, 0.67
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"SUPPORTS", confidence: 0.9}
+ERROR: could not find the answer format in answer from model: REFUTES, Confidence: 0.7 
+The statement appears to be an article about the African Super Cup, specifically the match between Al-Ahly and Berkane, talking about the coach's statements. This Statement does not mention Samar Hosni or the reasoning about her being kept away; therefore it does not support the claim, however, it still does relate in that it talks about the African Super Cup just like the claim.
+ERROR: could not find the answer format in answer from model: {"REFUTES", 0.8}
+ERROR: could not find the answer format in answer from model: SUPPORTS
+Confidence: 0.7
+ERROR: could not find the answer format in answer from model: REFUTES, Confidence: 0.8
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.7}
+ERROR: could not find the answer format in answer from model: {"NOT ENOUGH INFO": 1}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1} is not correct and we cant use new information.
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1.0}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1}
+ERROR: could not find the answer format in answer from model: REFUTES 
+confidence: 0.9 
+
+Statement does not mention anything about Al-Ahly management putting pressure on CAF.
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.95}
+ERROR: could not find the answer format in answer from model: {"REFUTES": "0.9"}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"decision": "NOT ENOUGH INFO", "confidence_score": 0.5}
+ERROR: could not find the answer format in answer from model: REFUTES, Confidence: 1.0
+ERROR: could not find the answer format in answer from model: {"decision": "REFUTES", "confidence_score": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"claim": REFUTES, "confidence": 0.8}
+ERROR: could not find the answer format in answer from model: {"claim": "By presidential order canceling the Corona test for Algerians at border crossings Algeria Border Crossings Tunisia Coronavirus", "statement": "Important: The President of the Republic Mr Abdelmadjid Tebboune honors the first and second best students nationally in the baccalaureate degree Ben Abbas Iman and Manar Merdas The honoring ceremony was attended by the Advisor to the President of the Republic in charge of Legal and Judicial Affairs the Acting Director of the Bureau Mr Boualem Bou
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0}
+ Confidence score: 0
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.8}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.9}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.95}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.95}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.95}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 0.95}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1}
+ERROR: could not find the answer format in answer from model: {"REFUTES": 1.0}
+ERROR: could not find the answer format in answer from model: {"REFUTES", 0.5}
+ERROR: could not find the answer format in answer from model: {"REFUTES", confidence: 0.8}

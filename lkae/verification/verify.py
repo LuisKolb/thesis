@@ -5,22 +5,12 @@ from lkae.utils.data_loading import AuredDataset, AuthorityPost
 
 import logging
 
-from lkae.verification.types import VerificationResult
+from lkae.verification.types import BaseVerifier, VerificationResult
 logger = logging.getLogger(__name__)
 
 # second logger for logging claim and evidence text score + judgement
 logger_text_score = logging.getLogger('lkae.verification.verify_log')
 
-from abc import ABC, abstractmethod
-
-class BaseVerifier(ABC):
-    @abstractmethod
-    def verify(self, claim: str, evidence: str, **kwargs) -> VerificationResult:
-        """Verify a claim based on the evidence."""
-        pass
-    
-    def __call__(self, claim: str, evidence: str, **kwargs) -> VerificationResult:
-        return self.verify(claim, evidence, **kwargs)
 
 class Judge(object):
     scale: bool
@@ -108,20 +98,42 @@ class Judge(object):
 
 def get_verifier(verifier_method: str, **kwargs) -> BaseVerifier:
     if 'LLAMA3' in verifier_method.upper():
-        from lkae.verification.models.llama3_hf import HFLlama3Verifier
-        return HFLlama3Verifier(**kwargs)
+        # additional optional parameters for LLAMA3Verifier
+        # verifier_model = "Meta-Llama-3.1-405B-Instruct"
+        # temperature = 0.2
+        # top_p = 1
+        from lkae.verification.models.llama3_azure_ai import Llama3AzureVerifier
+        return Llama3AzureVerifier(**kwargs)
 
     elif 'OPENAI' in verifier_method.upper():
+        # additional optional parameters for OpenaiVerifier
+        # api_key: str = ""
+        # assistant_id: str = "asst_XRITdOybDfYpIr4fVevm6qYi"
+        # temperature = 0.2
+        # top_p = 1
         from lkae.verification.models.openai_verifier import OpenaiVerifier
         return OpenaiVerifier(**kwargs)
     
     elif 'OLLAMA' in verifier_method.upper():
+        # additional optional parameters for OpenaiVerifier
+        # verifier_model = "llama3:instruct"
+        # temperature = 0.2
+        # top_p = 1
         from lkae.verification.models.ollama_verifier import OllamaVerifier
         return OllamaVerifier(**kwargs)
     
     elif 'TRANSFORMERS' in verifier_method.upper():
+        # additional optional parameters for TransformersVerifier
+        # verifier_model = "facebook/bart-large-mnli"
+        # task = "zero-shot-classification"
         from lkae.verification.models.transformers_verifier import TransformersVerifier
         return TransformersVerifier(**kwargs)
+    
+    elif 'DEBERTA' in verifier_method.upper():
+        # additional optional parameters for TransformersVerifier
+        # verifier_model = "tasksource/deberta-small-long-nli"
+        from lkae.verification.models.deberta_verifier import DebertaVerifier
+        return DebertaVerifier(**kwargs)
 
     else:
         raise ValueError(f"Invalid verifier method: {verifier_method}")
@@ -148,7 +160,7 @@ def judge_using_evidence(rumor_id, claim: str, evidence: List[AuthorityPost], ve
 def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge: Judge, blind: bool = False) -> List:
     res_jsons = []
 
-    for i, item in enumerate(dataset):
+    for i, item in enumerate(pbar := tqdm(dataset)):
         rumor_id = item["id"]
         if not blind: label = item["label"]
         claim = item["rumor"]
@@ -213,19 +225,19 @@ def run_verifier_on_dataset(dataset: AuredDataset, verifier: BaseVerifier, judge
                 }
             )
 
-    from lkae.verification.models.openai_verifier import OpenaiVerifier
     
-    if isinstance(verifier, OpenaiVerifier):
+    if verifier.supports_token_count():
         logger_text_score.info(f'-----total token usage for verification-----')
         logger_text_score.info(f'total tokens:\t{verifier.total_tokens_used}')
         logger_text_score.info(f'prompt tokens:\t{verifier.prompt_tokens_used}')
         logger_text_score.info(f'completion tokens:\t{verifier.completion_tokens_used}')
-        logger_text_score.info(f'price estimate:\t${((verifier.prompt_tokens_used/1000)*0.01) + ((verifier.completion_tokens_used/1000)*0.03)}')
+        pricing_map = verifier.model_to_cost_map[verifier.model]
+        logger_text_score.info(f'price estimate:\t${((verifier.prompt_tokens_used/pricing_map["per_n_tokens"])*pricing_map["input_token_price"]) + ((verifier.completion_tokens_used/pricing_map["per_n_tokens"])*pricing_map["output_token_price"])}')
         print(f'-----total token usage for verification-----')
         print(f'total tokens:\t{verifier.total_tokens_used}')
         print(f'prompt tokens:\t{verifier.prompt_tokens_used}')
         print(f'completion tokens:\t{verifier.completion_tokens_used}')
-        print(f'price estimate:\t${((verifier.prompt_tokens_used/1000)*0.01) + ((verifier.completion_tokens_used/1000)*0.03)}')
+        print(f'price estimate:\t${((verifier.prompt_tokens_used/pricing_map["per_n_tokens"])*pricing_map["input_token_price"]) + ((verifier.completion_tokens_used/pricing_map["per_n_tokens"])*pricing_map["output_token_price"])}')
     return res_jsons
 
 

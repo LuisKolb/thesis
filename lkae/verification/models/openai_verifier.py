@@ -2,8 +2,7 @@ import os
 import json
 from openai import OpenAI
 
-from lkae.verification.types import VerificationResult
-from lkae.verification.verify import BaseVerifier
+from lkae.verification.types import VerificationResult, BaseVerifier 
 from lkae.verification.models._llm_sys_message import sys_message
 
 import logging
@@ -16,7 +15,14 @@ class OpenaiVerifier(BaseVerifier):
         self.client = OpenAI(
             api_key=(api_key or os.environ.get("OPENAI_API_KEY")),
         )
-        self.assistant_id: str = assistant_id
+
+        self.model: str = assistant_id
+
+        self.model_to_cost_map = {
+            "asst_XRITdOybDfYpIr4fVevm6qYi": {"input_token_price": 0.00500, "output_token_price": 0.01500, "per_n_tokens": 1000}, # 4o
+            "asst_xDbPAMhYqIgD6E2uuPqe2TeO": {"input_token_price": 0.000150, "output_token_price": 0.000600, "per_n_tokens": 1000}, # 4o-mini
+        }
+
         self.total_tokens_used: int = 0
         self.prompt_tokens_used: int = 0
         self.completion_tokens_used: int = 0
@@ -27,6 +33,8 @@ class OpenaiVerifier(BaseVerifier):
         
         self.valid_labels = ["REFUTES", "NOT ENOUGH INFO", "SUPPORTS"]
 
+    def supports_token_count(self) -> bool:
+        return True
     
     def get_assistant_response(self, input_message):
         thread = self.client.beta.threads.create()
@@ -38,7 +46,7 @@ class OpenaiVerifier(BaseVerifier):
 
         run = self.client.beta.threads.runs.create_and_poll(
             thread_id=thread.id,
-            assistant_id=self.assistant_id,
+            assistant_id=self.model,
             temperature=self.temperature,
             top_p=self.top_p
         )
@@ -57,7 +65,7 @@ class OpenaiVerifier(BaseVerifier):
                         return messages.data[0].content[0].text.value # type: ignore
         else:
             logger.warn(f'run failed with status: {run.status}, returning NOT ENOUGH INFO answer')
-            return '{"decision": "NOT ENOUGH INFO", confidence": 1.0}' # need to return a string that can be json-parsed
+            return '{"decision": "NOT ENOUGH INFO", "confidence": 1.0}' # need to return a string that can be json-parsed
 
     
     def verify(self, claim: str, evidence: str) -> VerificationResult:
@@ -74,7 +82,7 @@ class OpenaiVerifier(BaseVerifier):
                 logger.warn(f'could not json-parse response from openai model: {answer}')
                 return VerificationResult("NOT ENOUGH INFO", 1.0)
 
-        if decision and decision in self.valid_labels:
+        if decision and (decision in self.valid_labels):
             return VerificationResult(decision, confidence)
         else:
             return VerificationResult("NOT ENOUGH INFO", 1.0)

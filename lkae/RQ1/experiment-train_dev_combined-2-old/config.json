@@ -1,0 +1,13 @@
+{
+    "configs": [
+        {
+            "retriever_method": "bm25",
+            "retriever_k": 5
+        },
+        {
+            "retriever_method": "rerank-nv-embed-v1",
+            "retriever_k": 5,
+            "retriever_model": "nvidia/nv-embed-v1"
+        }
+    ]
+}
