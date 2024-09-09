@@ -175,8 +175,8 @@ class AuredDataset(object):
 
                 # if all info is added, evidence will look like this:
                 #
-                # Authority Description: "{bio}"
                 # Authority Name: "{name}"
+                # Authority Description: "{bio}"
                 # Statement from {twitter handle}: "{post.text}"
 
             if self.preprocess:
