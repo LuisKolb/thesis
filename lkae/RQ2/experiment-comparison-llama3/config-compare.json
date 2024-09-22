@@ -5,11 +5,11 @@
             "verifier_model": "Meta-Llama-3.1-8B-Instruct"
         },
         {
-            "verifier_method": "llama3-1-70b",
+            "verifier_method": "llama3-1-70B",
             "verifier_model": "Meta-Llama-3.1-70B-Instruct"
         },
         {
-            "verifier_method": "llama3-1-405b",
+            "verifier_method": "llama3-1-405B",
             "verifier_model": "Meta-Llama-3.1-405B-Instruct"
         }
     ]
