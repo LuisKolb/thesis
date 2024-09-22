@@ -1,0 +1,28 @@
+{
+    "configs": [
+        {
+            "verifier_method": "llama3-1-70b-run1",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct",
+            "temperature": 1,
+            "top_p": 1
+        },
+        {
+            "verifier_method": "llama3-1-70b-run2",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct",
+            "temperature": 0.1,
+            "top_p": 1
+        },
+        {
+            "verifier_method": "llama3-1-70b-run3",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct",
+            "temperature": 1,
+            "top_p": 0.1
+        },
+        {
+            "verifier_method": "llama3-1-70b-run4",
+            "verifier_model": "Meta-Llama-3.1-70B-Instruct",
+            "temperature": 0.5,
+            "top_p": 0.5
+        }
+    ]
+}

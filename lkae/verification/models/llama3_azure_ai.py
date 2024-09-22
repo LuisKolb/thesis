@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.ai.inference import ChatCompletionsClient
@@ -84,7 +85,13 @@ class Llama3AzureVerifier(BaseVerifier):
             logger.warn(f'!!! answer was null in response to input_text text: {input_text}')
         else:
             try:
-                decision, confidence = json.loads(answer).values()
+                pattern = r'{[\s\S]*}'
+                # find the first match
+                match = re.search(pattern, answer)
+                if match:
+                    decision, confidence = json.loads(match.group(0)).values()
+                else:
+                    raise ValueError(f'could not find json regex match in response from Azure API: {answer}')
             except ValueError:
                 logger.warn(f'could not json-parse response from Azure API: {answer}, returning NOT ENOUGH INFO answer')
                 return VerificationResult("NOT ENOUGH INFO", 1.0)
